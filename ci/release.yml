@@ -4,7 +4,7 @@ name: Release Vuego CLI binaries
 vars:
   name: vuego-cli
   semver: $(git tag | tail -n 1)
-  image: titpetric/vuego
+  image: titpetric/vuego-cli
   build:
     goarch: [arm64, amd64]
 
