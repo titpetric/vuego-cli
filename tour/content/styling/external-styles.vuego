@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>External Stylesheets</title>
+<link rel="stylesheet" href="styles/forms.less">
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+.example {
+  margin: 2rem 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>External Stylesheets</h1>
+
+<p>You can link to external <code>.css</code> or <code>.less</code> files using standard HTML <code>&lt;link&gt;</code> tags.</p>
+
+<div class="example">
+<h2>Form Example</h2>
+<form>
+<div class="form-group">
+<label for="email">Email Address</label>
+<input type="email" id="email" placeholder="your@email.com" required>
+</div>
+
+<div class="form-group">
+<label for="password">Password</label>
+<input type="password" id="password" placeholder="Enter password" required>
+</div>
+
+<div class="form-actions">
+<button type="submit" class="btn btn-primary">Submit</button>
+<button type="reset" class="btn btn-secondary">Clear</button>
+</div>
+</form>
+</div>
+
+<p>The form styling comes from the external <code>styles/forms.less</code> file which is compiled and served as CSS.</p>
+</div>
+</body>
+</html>

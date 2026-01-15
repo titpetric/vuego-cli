@@ -1,0 +1,15 @@
+# Coverage files
+*.out
+/*.json
+/atkins.log
+*.test
+*.txt
+*.log
+/bin
+*.prof
+pkg.cov
+pkg.cov.json
+go-fsck.json
+
+# Build artifacts
+/vuego-cli
