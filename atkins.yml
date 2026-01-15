@@ -1,0 +1,26 @@
+name: Vuego CLI automation
+
+jobs:
+  default:
+    steps:
+      - task: fmt
+      - task: lint
+      - task: test
+
+  fmt:
+    desc: "Format the code"
+    steps:
+      - goimports -w -local $(go list .) .
+      - goimports-reviser -set-alias -format -imports-order "std,blanked,general,company,project" ./...
+      - go fmt ./...
+      - go mod tidy
+
+  test:
+    passthru: true
+    steps:
+      - gotestsum ./... -- -count 1
+
+  lint:
+    passthru: true
+    steps:
+      - go-fsck lint ./...
