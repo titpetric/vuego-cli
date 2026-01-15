@@ -21,6 +21,16 @@ Available commands:
 - `tour`: Start the vuego tour server
 - `version`: Show version/build information
 
+## Docker
+
+You can also use the `titpetric/vuego-cli` docker image.
+
+```bash
+docker run --rm -p 8080:8080 titpetric/vuego-cli
+```
+
+By default it starts the tour server on [http://localhost:8080](http://localhost:8080).
+
 ## Testing
 
 Tests are implemented using [titpetric/atkins](https://github.com/titpetric/atkins).
