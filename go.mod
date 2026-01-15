@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.4
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
-	github.com/titpetric/cli v0.2.0
+	github.com/titpetric/cli v0.2.3
 	github.com/titpetric/lessgo v0.1.0
 	github.com/titpetric/platform v0.2.3
 	github.com/titpetric/vuego v0.6.1
@@ -36,6 +36,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.39.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.9.0 // indirect
+	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
@@ -43,4 +44,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260114163908-3f89685c29c3 // indirect
 	google.golang.org/grpc v1.78.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
+	modernc.org/sqlite v1.44.0 // indirect
 )
