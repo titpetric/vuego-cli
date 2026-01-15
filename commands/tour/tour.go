@@ -2,30 +2,39 @@ package tour
 
 import (
 	"context"
-	"flag"
 	"log"
 	"os"
 
+	flag "github.com/spf13/pflag"
+	"github.com/titpetric/cli"
 	"github.com/titpetric/platform"
 
 	"github.com/titpetric/vuego-cli/tour"
 )
 
-// Run executes the tour command with the given arguments.
-func Run(args []string) error {
-	fs := flag.NewFlagSet("tour", flag.ContinueOnError)
-	addr := fs.String("addr", ":8080", "HTTP server address")
-	contentPath := fs.String("content", "", "Path to tour content directory (uses embedded if not specified)")
+// Name is the command title.
+const Name = "Start the vuego tour server"
 
-	if err := fs.Parse(args); err != nil {
-		return err
+// New creates a new tour command.
+func New() *cli.Command {
+	var addr string
+	var contentPath string
+
+	return &cli.Command{
+		Name:  "tour",
+		Title: Name,
+		Bind: func(fs *flag.FlagSet) {
+			flag.StringVar(&addr, "addr", ":8080", "HTTP server address")
+			flag.StringVar(&contentPath, "content", "", "Path to tour content directory (uses embedded if not specified)")
+		},
+		Run: func(ctx context.Context, args []string) error {
+			return Serve(ctx, addr, contentPath)
+		},
 	}
-
-	return Serve(*addr, *contentPath)
 }
 
 // Serve starts the tour server using the platform.
-func Serve(addr string, contentPath string) error {
+func Serve(ctx context.Context, addr string, contentPath string) error {
 	opts := platform.NewOptions()
 	opts.ServerAddr = addr
 
@@ -48,20 +57,4 @@ func Serve(addr string, contentPath string) error {
 
 	p.Wait()
 	return nil
-}
-
-// Usage returns the usage string for the tour command.
-func Usage() string {
-	return `vuego tour [options]
-
-Start the vuego tour server.
-
-Options:
-   -addr string      HTTP server address (default ":8080")
-   -content string   Path to tour content directory (uses embedded if not specified)
-
-Examples:
-   vuego tour                                          # Start tour on default port with embedded content
-   vuego tour -addr :3000                              # Start tour on port 3000
-   vuego tour -content ./cmd/vuego/server/tour/content # Start tour with local content directory`
 }

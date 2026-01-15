@@ -1,6 +1,7 @@
 package serve_test
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,7 +33,8 @@ func TestServe_Integration(t *testing.T) {
 }
 
 func TestServe_InvalidDirectory(t *testing.T) {
-	err := serve.Serve("/nonexistent/path", ":8080")
+	ctx := context.Background()
+	err := serve.Serve(ctx, "/nonexistent/path", ":8080")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "directory not accessible")
 }

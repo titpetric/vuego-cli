@@ -8,14 +8,8 @@ import (
 	"github.com/titpetric/vuego-cli/commands/tour"
 )
 
-func TestUsage(t *testing.T) {
-	usage := tour.Usage()
-	require.NotEmpty(t, usage)
-	require.Contains(t, usage, "vuego tour")
-	require.Contains(t, usage, "-addr")
-}
-
-func TestRun_InvalidFlag(t *testing.T) {
-	err := tour.Run([]string{"--invalid-flag"})
-	require.Error(t, err)
+func TestCommandCreation(t *testing.T) {
+	cmd := tour.New()
+	require.NotNil(t, cmd)
+	require.Equal(t, "tour", cmd.Name)
 }

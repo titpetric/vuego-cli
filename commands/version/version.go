@@ -1,9 +1,13 @@
 package version
 
 import (
+	"context"
 	"debug/buildinfo"
 	"fmt"
 	"os"
+
+	flag "github.com/spf13/pflag"
+	"github.com/titpetric/cli"
 )
 
 // Info contains injected build environment information.
@@ -13,6 +17,23 @@ type Info struct {
 	CommitTime string
 	Branch     string
 	Modified   string
+}
+
+// Name is the command title.
+const Name = "Show version/build information"
+
+// NewWithInfo creates a new version command with build information.
+func NewWithInfo(info Info) *cli.Command {
+	return &cli.Command{
+		Name:  "version",
+		Title: Name,
+		Bind: func(fs *flag.FlagSet) {
+			// No flags for version command
+		},
+		Run: func(ctx context.Context, args []string) error {
+			return Run(info)
+		},
+	}
 }
 
 // Run will print version information for the build.

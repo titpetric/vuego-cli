@@ -1,6 +1,7 @@
 package diff_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,21 +10,17 @@ import (
 )
 
 func TestRun_WrongNumberOfArguments(t *testing.T) {
-	err := diff.Run([]string{})
+	cmd := diff.New()
+
+	err := cmd.Run(context.TODO(), []string{})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "requires exactly 2 file arguments")
 
-	err = diff.Run([]string{"file1.html"})
+	err = cmd.Run(context.TODO(), []string{"file1.html"})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "requires exactly 2 file arguments")
 
-	err = diff.Run([]string{"a", "b", "c"})
+	err = cmd.Run(context.TODO(), []string{"a", "b", "c"})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "requires exactly 2 file arguments")
-}
-
-func TestUsage(t *testing.T) {
-	usage := diff.Usage()
-	require.NotEmpty(t, usage)
-	require.Contains(t, usage, "vuego diff")
 }

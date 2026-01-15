@@ -2,7 +2,7 @@ package serve
 
 import (
 	"bytes"
-	"flag"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,28 +10,34 @@ import (
 	"path/filepath"
 
 	chi "github.com/go-chi/chi/v5"
+	flag "github.com/spf13/pflag"
+	"github.com/titpetric/cli"
 	"github.com/titpetric/lessgo"
 
 	"github.com/titpetric/vuego-cli/server"
 )
 
-// Run executes the serve command with the given arguments.
-// Usage: vuego serve [options] [directory].
-func Run(args []string) error {
-	fs := flag.NewFlagSet("serve", flag.ContinueOnError)
-	addr := fs.String("addr", ":8080", "HTTP server address")
+// Name is the command title.
+const Name = "Start development server for templates and assets"
 
-	if err := fs.Parse(args); err != nil {
-		return err
+// New creates a new serve command.
+func New() *cli.Command {
+	var addr string
+
+	return &cli.Command{
+		Name:  "serve",
+		Title: Name,
+		Bind: func(fs *flag.FlagSet) {
+			flag.StringVar(&addr, "addr", ":8080", "HTTP server address")
+		},
+		Run: func(ctx context.Context, args []string) error {
+			dir := "."
+			if len(args) > 0 {
+				dir = args[0]
+			}
+			return Serve(ctx, dir, addr)
+		},
 	}
-
-	positional := fs.Args()
-	dir := "."
-	if len(positional) > 0 {
-		dir = positional[0]
-	}
-
-	return Serve(dir, *addr)
 }
 
 // Serve starts an HTTP server that serves templates and assets from the given directory.
@@ -40,7 +46,7 @@ func Run(args []string) error {
 // - .vuego file rendering via server middleware
 // - .less file compilation via lessgo middleware
 // - Directory listing and file serving for all other files.
-func Serve(dir string, addr string) error {
+func Serve(ctx context.Context, dir string, addr string) error {
 	absDir, err := filepath.Abs(dir)
 	if err != nil {
 		return fmt.Errorf("invalid directory: %w", err)

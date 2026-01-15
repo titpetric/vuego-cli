@@ -1,6 +1,7 @@
 package format_test
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -10,7 +11,8 @@ import (
 )
 
 func TestRun_NoFiles(t *testing.T) {
-	err := format.Run([]string{})
+	cmd := format.New()
+	err := cmd.Run(context.TODO(), []string{})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "missing file argument")
 }
@@ -24,12 +26,7 @@ func TestRun_FormatsFile(t *testing.T) {
 	require.NoError(t, err)
 	tmpFile.Close()
 
-	err = format.Run([]string{tmpFile.Name()})
+	cmd := format.New()
+	err = cmd.Run(context.TODO(), []string{tmpFile.Name()})
 	require.NoError(t, err)
-}
-
-func TestUsage(t *testing.T) {
-	usage := format.Usage()
-	require.NotEmpty(t, usage)
-	require.Contains(t, usage, "vuego fmt")
 }

@@ -1,6 +1,7 @@
 package render_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,19 +10,15 @@ import (
 )
 
 func TestRun_WrongNumberOfArguments(t *testing.T) {
+	cmd := render.New()
+
 	// No arguments
-	err := render.Run([]string{})
+	err := cmd.Run(context.TODO(), []string{})
 	require.Error(t, err)
 	require.Equal(t, "render: requires 1 or 2 arguments", err.Error())
 
 	// Too many arguments
-	err = render.Run([]string{"a", "b", "c"})
+	err = cmd.Run(context.TODO(), []string{"a", "b", "c"})
 	require.Error(t, err)
 	require.Equal(t, "render: requires 1 or 2 arguments", err.Error())
-}
-
-func TestUsage(t *testing.T) {
-	usage := render.Usage()
-	require.NotEmpty(t, usage)
-	require.Contains(t, usage, "vuego render")
 }

@@ -1,55 +1,63 @@
 package diff
 
 import (
-	"flag"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 
+	flag "github.com/spf13/pflag"
+	"github.com/titpetric/cli"
 	"github.com/titpetric/vuego/diff"
 )
 
-// Run executes the diff command with the given arguments.
-func Run(args []string) error {
-	fs := flag.NewFlagSet("diff", flag.ContinueOnError)
-	outputFormat := fs.String("output", "unified", "output format: simple, unified, yaml")
-	fs.String("format", "unified", "deprecated: use --output instead")
+// Name is the command title.
+const Name = "Compare two HTML/vuego files using DOM comparison"
 
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
+// New creates a new diff command.
+func New() *cli.Command {
+	var outputFormat string
 
-	positional := fs.Args()
-	if len(positional) != 2 {
-		return fmt.Errorf("diff: requires exactly 2 file arguments\nUsage: vuego diff [--output FORMAT] <file1> <file2>\n\nFormats: simple, unified, yaml")
-	}
+	return &cli.Command{
+		Name:  "diff",
+		Title: Name,
+		Bind: func(fs *flag.FlagSet) {
+			flag.StringVar(&outputFormat, "output", "unified", "output format: simple, unified, yaml")
+			flag.StringVar(&outputFormat, "format", "unified", "deprecated: use --output instead")
+		},
+		Run: func(ctx context.Context, args []string) error {
+			if len(args) != 2 {
+				return fmt.Errorf("diff: requires exactly 2 file arguments")
+			}
 
-	file1 := positional[0]
-	file2 := positional[1]
+			file1 := args[0]
+			file2 := args[1]
 
-	// Read both files
-	content1, err := os.ReadFile(file1)
-	if err != nil {
-		return fmt.Errorf("reading %s: %w", file1, err)
-	}
+			// Read both files
+			content1, err := os.ReadFile(file1)
+			if err != nil {
+				return fmt.Errorf("reading %s: %w", file1, err)
+			}
 
-	content2, err := os.ReadFile(file2)
-	if err != nil {
-		return fmt.Errorf("reading %s: %w", file2, err)
-	}
+			content2, err := os.ReadFile(file2)
+			if err != nil {
+				return fmt.Errorf("reading %s: %w", file2, err)
+			}
 
-	// Compare using DOM-aware comparison
-	isEqual := diff.CompareHTML(content1, content2)
+			// Compare using DOM-aware comparison
+			isEqual := diff.CompareHTML(content1, content2)
 
-	switch *outputFormat {
-	case "simple":
-		return runSimple(file1, file2, content1, content2, isEqual)
-	case "unified":
-		return runUnified(file1, file2, content1, content2, isEqual)
-	case "yaml":
-		return runYAML(content1, content2, isEqual)
-	default:
-		return fmt.Errorf("unknown output format: %s (use: simple, unified, yaml)", *outputFormat)
+			switch outputFormat {
+			case "simple":
+				return runSimple(file1, file2, content1, content2, isEqual)
+			case "unified":
+				return runUnified(file1, file2, content1, content2, isEqual)
+			case "yaml":
+				return runYAML(content1, content2, isEqual)
+			default:
+				return fmt.Errorf("unknown output format: %s (use: simple, unified, yaml)", outputFormat)
+			}
+		},
 	}
 }
 
@@ -120,19 +128,4 @@ func runYAML(content1, content2 []byte, isEqual bool) error {
 		return fmt.Errorf("DOM trees do not match")
 	}
 	return nil
-}
-
-// Usage returns the usage string for the diff command.
-func Usage() string {
-	return `vuego diff [--output FORMAT] <file1> <file2>
-
-Compare two HTML/vuego files using DOM comparison (ignores formatting).
-
-Options:
-  --output FORMAT    Output format: simple, unified (default), yaml
-
-Examples:
-  vuego diff before.html after.html
-  vuego diff --output yaml file1.html file2.html | dyff between - -
-  vuego diff --output simple file1.html file2.html | colordiff`
 }
