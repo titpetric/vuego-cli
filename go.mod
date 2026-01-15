@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.4
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
-	github.com/titpetric/cli v0.2.3
+	github.com/titpetric/cli v0.2.4
 	github.com/titpetric/lessgo v0.1.0
 	github.com/titpetric/platform v0.2.3
 	github.com/titpetric/vuego v0.6.1
