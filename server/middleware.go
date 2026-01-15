@@ -9,9 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	yaml "gopkg.in/yaml.v3"
-
 	"github.com/titpetric/vuego"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // MiddlewareOption configures the middleware behavior.

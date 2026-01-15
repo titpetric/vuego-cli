@@ -11,8 +11,8 @@ import (
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/titpetric/platform"
-
 	"github.com/titpetric/vuego"
+
 	"github.com/titpetric/vuego-cli/server"
 )
 

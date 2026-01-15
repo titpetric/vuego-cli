@@ -7,9 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	yaml "gopkg.in/yaml.v3"
-
 	"github.com/titpetric/vuego"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // Run executes the render command with the given arguments.

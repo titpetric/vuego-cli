@@ -9,9 +9,8 @@ import (
 	"strings"
 	"testing/fstest"
 
-	yaml "gopkg.in/yaml.v3"
-
 	"github.com/titpetric/vuego"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // RenderRequest contains template and data for rendering.
@@ -235,5 +234,3 @@ func injectStyleLinksForRequest(buf *bytes.Buffer, files map[string]string) (str
 
 	return htmlContent, nil
 }
-
-
