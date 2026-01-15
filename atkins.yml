@@ -53,7 +53,19 @@ jobs:
     desc: "Install"
     depends_on: build
     steps:
-      - cmds:  # This implements a rename based self-update
-          - cp -f ./bin/${{name}}-linux-$(dpkg --print-architecture) /usr/local/bin/${{name}}.new
-          - mv -f /usr/local/bin/${{name}} /usr/local/bin/${{name}}.old
-          - mv -f /usr/local/bin/${{name}}.new /usr/local/bin/${{name}}
+      - cp -f ./bin/${{name}}-linux-$(dpkg --print-architecture) /usr/local/bin/${{name}}.new
+      - mv -f /usr/local/bin/${{name}} /usr/local/bin/${{name}}.old
+      - mv -f /usr/local/bin/${{name}}.new /usr/local/bin/${{name}}
+
+  release:
+    desc: "Release vuego"
+    steps:
+      - task: install
+      - ./ci/release.yml build
+      - ./ci/release.yml test
+
+  publish:
+    desc: "Publish release"
+    depends_on: release
+    steps:
+      - ./ci/release.yml publish
