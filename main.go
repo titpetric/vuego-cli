@@ -22,7 +22,7 @@ func main() {
 }
 
 func run() error {
-	app := cli.NewApp("vuego")
+	app := cli.NewApp("vuego-cli")
 
 	// Register commands
 	app.AddCommand("fmt", format.Name, format.New)
