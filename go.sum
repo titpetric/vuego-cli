@@ -76,8 +76,8 @@ github.com/titpetric/lessgo v0.1.0 h1:TrssCXiQPw3zZ4qIzVg7wytZXQz7ir3mGv6LYDzeVj
 github.com/titpetric/lessgo v0.1.0/go.mod h1:VKjDECI8RxTqRmbBRi4y1rAyldGAHuiZohAHGGkTo6g=
 github.com/titpetric/platform v0.2.3 h1:Z4UF3CNPKr47YLeImgrAAsYe0cASr3kPPjxtpycC7GE=
 github.com/titpetric/platform v0.2.3/go.mod h1:4dk8yJzQYm8WXu47p3Vt6JZGoXH++Svw3zHNt9b7EE4=
-github.com/titpetric/vuego v0.6.1 h1:9qlJ/G/CMsI67kUIXSFruBY9No2wV+Jhu5XGMa/OFt4=
-github.com/titpetric/vuego v0.6.1/go.mod h1:5NcqzxVU99yoymsNKLvr6a6Bb0zaeGlsBlL/VGbaXKI=
+github.com/titpetric/vuego v0.6.2 h1:JzjwHvFN6UgNDHoOgdS2D/BsYiAlmCQErdSxh9ChL+0=
+github.com/titpetric/vuego v0.6.2/go.mod h1:dQh6I1Ea0uZ74PA1wImD1QUvjx6+lXHKiF1mNXxBn3s=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
 go.opentelemetry.io/auto/sdk v1.2.1/go.mod h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=
 go.opentelemetry.io/otel v1.39.0 h1:8yPrr/S0ND9QEfTfdP9V+SiwT4E0G7Y5MO7p85nis48=

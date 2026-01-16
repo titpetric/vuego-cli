@@ -147,12 +147,13 @@ func (cfs *combinedFS) ReadDir(name string) ([]fs.DirEntry, error) {
 	return fs.ReadDir(cfs.secondary, name)
 }
 
-// injectStyleLinksIntoTemplate injects style tags directly into the template string
+// injectStyleLinksIntoTemplate injects style tags directly into the template string.
+// Assumes all files have already been processed (LESS compiled to CSS).
 func injectStyleLinksIntoTemplate(template string, files map[string]string) string {
 	// For API requests, look for style files in the files map
 	var styleFiles []string
 	for name := range files {
-		if strings.HasSuffix(name, ".less") || strings.HasSuffix(name, ".css") {
+		if strings.HasSuffix(name, ".css") {
 			styleFiles = append(styleFiles, name)
 		}
 	}
@@ -165,17 +166,10 @@ func injectStyleLinksIntoTemplate(template string, files map[string]string) stri
 	var styleTags strings.Builder
 	for _, name := range styleFiles {
 		if content, ok := files[name]; ok {
-			// For LESS files, use type="text/css+less" so the LessProcessor compiles it
-			if strings.HasSuffix(name, ".less") {
-				styleTags.WriteString("\n<style type=\"text/css+less\">")
-				styleTags.WriteString(content)
-				styleTags.WriteString("</style>")
-			} else {
-				// For plain CSS files, use regular style tag
-				styleTags.WriteString("\n<style>")
-				styleTags.WriteString(content)
-				styleTags.WriteString("</style>")
-			}
+			// All files at this point are CSS (LESS has been compiled)
+			styleTags.WriteString("\n<style>")
+			styleTags.WriteString(content)
+			styleTags.WriteString("</style>")
 		}
 	}
 

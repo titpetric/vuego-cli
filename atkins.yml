@@ -34,6 +34,7 @@ jobs:
     passthru: true
     steps:
       - go-fsck lint ./...
+      - go vet ./...
 
   build:
     desc: "Build"

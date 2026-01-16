@@ -1,8 +1,10 @@
 package tour_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -173,12 +175,27 @@ func TestModule_StylingLesson1_IncludesFormsLess(t *testing.T) {
 func TestModule_RenderEndpoint_InjectsStyleTags(t *testing.T) {
 	handler := newTestHandler(t)
 
-	// Render a template with form styles included
-	body := `{"template": "<html><head></head><body><form></form></body></html>", "data": "{}", "files": {"forms.less": ".form-group { margin: 1rem; a { font-weight: bold; } }"}}`
-	req := httptest.NewRequest(http.MethodPost, "/render", strings.NewReader(body))
+	// Render a template with form styles included (valid LESS syntax)
+	req := httptest.NewRequest(http.MethodPost, "/render", nil)
 	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
 
+	reqBody := map[string]any{
+		"template": `<html><head></head><body><style type="text/css+less">{{ file("forms.less") }}</style></body></html>`,
+		"data":     "{}",
+		"files": map[string]string{
+			"forms.less": `.form-group {
+  margin: 1rem;
+
+  a {
+    font-weight: bold;
+  }
+}`,
+		},
+	}
+	jsonBody, _ := json.Marshal(reqBody)
+	req.Body = io.NopCloser(bytes.NewReader(jsonBody))
+
+	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
 	require.Equal(t, http.StatusOK, rec.Code)
@@ -188,6 +205,6 @@ func TestModule_RenderEndpoint_InjectsStyleTags(t *testing.T) {
 	err := json.NewDecoder(rec.Body).Decode(&resp)
 	require.NoError(t, err)
 	require.Empty(t, resp["error"])
-	require.Contains(t, resp["html"], "<style ")
-	require.Contains(t, resp["html"], ".form-group")
+	require.Contains(t, resp["html"], "<style")
+	require.Contains(t, resp["html"], ".form-group a {")
 }
