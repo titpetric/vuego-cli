@@ -6,6 +6,7 @@ import (
 	"embed"
 	"encoding/json"
 	"io/fs"
+	"log"
 	"net/http"
 	"strings"
 
@@ -163,7 +164,7 @@ func (m *Module) handleRender(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	html, err := server.Render(r.Context(), m.tourFS, req)
+	html, err := server.Render(r.Context(), m.tourFS, req, vuego.WithLessProcessor())
 	if err != nil {
 		_ = json.NewEncoder(w).Encode(server.RenderResponse{Error: err.Error()})
 		return
@@ -195,8 +196,10 @@ func (m *Module) renderTourPage(w http.ResponseWriter, lesson *Lesson, markdown 
 		data["readme"] = markdown
 	}
 
-	tmpl := vuego.New()
+	tmpl := vuego.New(vuego.WithLessProcessor())
 	var buf bytes.Buffer
-	_ = tmpl.Fill(data).RenderString(context.Background(), &buf, m.indexTmpl)
+	if err := tmpl.Fill(data).RenderString(context.Background(), &buf, m.indexTmpl); err != nil {
+		log.Printf("error rendering tour page: %v", err)
+	}
 	_, _ = buf.WriteTo(w)
 }

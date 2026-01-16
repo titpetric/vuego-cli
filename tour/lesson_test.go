@@ -611,7 +611,7 @@ func TestParseTour_EmbeddedContent(t *testing.T) {
 		lessonCount int
 	}{
 		{"Variable Interpolation", 4}, // 01-interpolation.md has 4 ## headings (added Expressions & Operators)
-		{"Filters", 3},                // 02-filters.md has 3 ## headings
+		{"Filters", 4},                // 02-filters.md has 4 ## headings
 		{"Directives", 7},             // 03-directives.md has 7 ## headings (added v-for empty, binding-objects, more-directives)
 		{"Components", 6},             // 04-components.md has 6 ## headings (added component shorthands)
 		{"Styling", 3},                // 05-styling.md has 3 ## headings (inline-less, external-styles, registration form)

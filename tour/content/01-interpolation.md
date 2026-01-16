@@ -32,6 +32,8 @@ Access array elements by index using bracket notation: `{{ array[0] }}`.
 
 You can combine this with property access: `{{ users[0].name }}`.
 
+It's also possible to use object notation, `{{ users.0.name }}`.
+
 - [Syntax - Array Elements](https://github.com/titpetric/vuego/blob/main/docs/syntax.md#values)
 
 @file: arrays.vuego

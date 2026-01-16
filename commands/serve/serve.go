@@ -13,6 +13,7 @@ import (
 	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/lessgo"
+	"github.com/titpetric/vuego"
 
 	"github.com/titpetric/vuego-cli/server"
 )
@@ -71,7 +72,7 @@ func Serve(ctx context.Context, dir string, addr string) error {
 	// vuego middleware for .vuego files (wrapped to pass through to file server)
 	mux.Use(func(next http.Handler) http.Handler {
 		return &vuegoMiddleware{
-			vuegoHandler: server.Middleware(dirFS),
+			vuegoHandler: server.Middleware(dirFS, server.WithLoadOption(vuego.WithLessProcessor())),
 			next:         next,
 		}
 	})
