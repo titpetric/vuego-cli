@@ -92,15 +92,8 @@ func Render(ctx context.Context, baseFS fs.FS, req RenderRequest, opts ...vuego.
 
 	var buf bytes.Buffer
 
-	// Check if template has a layout specified
-	if layout := tpl.Get("layout"); layout != "" {
-		if err := tpl.Layout(ctx, &buf); err != nil {
-			return "", err
-		}
-	} else {
-		if err := tpl.Render(ctx, &buf); err != nil {
-			return "", err
-		}
+	if err := tpl.Render(ctx, &buf); err != nil {
+		return "", err
 	}
 
 	return buf.String(), nil
