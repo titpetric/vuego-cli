@@ -21,6 +21,11 @@ Available commands:
 - `tour`: Start the vuego tour server
 - `version`: Show version/build information
 
+The `serve` and `tour` take an optional path argument after the command.
+If provided, the contents will be loaded from that location. If omitted,
+the `tour` command will load the embedded tour, and the `serve` command
+will load files from the current directory (`.`).
+
 ## Docker
 
 You can also use the `titpetric/vuego-cli` docker image.
