@@ -30,6 +30,21 @@ docker run --rm -p 8080:8080 titpetric/vuego-cli
 ```
 
 By default it starts the tour server on [http://localhost:8080](http://localhost:8080).
+From your templates folder, run:
+
+```bash
+docker run --rm -p 8080:8080 -v $PWD:/app titpetric/vuego-cli serve .
+```
+
+When you navigate to any of the following files:
+
+- `.json` - data for the template is displayed,
+- `.less` - LESS CSS is rendered to CSS on the fly
+- `.vuego` - will render the template with the json data
+
+When you edit the data and template in your editor of choice, you have
+to refresh your browser to see the changes (similar to PHP development).
+No server restart is necessary.
 
 ## Testing
 
