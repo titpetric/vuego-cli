@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
 
-	chi "github.com/go-chi/chi/v5"
 	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/lessgo"
+	"github.com/titpetric/platform"
 	"github.com/titpetric/vuego"
 
 	"github.com/titpetric/vuego-cli/server"
@@ -41,6 +41,56 @@ func New() *cli.Command {
 	}
 }
 
+// Module represents the serve module for the platform.
+type Module struct {
+	platform.UnimplementedModule
+
+	dir    string
+	absDir string
+	dirFS  fs.FS
+}
+
+// NewModule creates a new serve module for the given directory.
+func NewModule(dir string) (*Module, error) {
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return nil, fmt.Errorf("invalid directory: %w", err)
+	}
+
+	if _, err := os.Stat(absDir); err != nil {
+		return nil, fmt.Errorf("directory not accessible: %w", err)
+	}
+
+	return &Module{
+		dir:    dir,
+		absDir: absDir,
+		dirFS:  os.DirFS(absDir),
+	}, nil
+}
+
+// Name returns the module name.
+func (m *Module) Name() string {
+	return "vuego-serve"
+}
+
+// Mount registers the serve routes.
+func (m *Module) Mount(_ context.Context, r platform.Router) error {
+	fileServer := http.FileServer(http.FS(m.dirFS))
+
+	r.Use(lessgo.NewMiddleware(m.dirFS, "/"))
+
+	r.Use(func(next http.Handler) http.Handler {
+		return &vuegoMiddleware{
+			vuegoHandler: server.Middleware(m.dirFS, server.WithLoadOption(vuego.WithLessProcessor(), vuego.WithComponents())),
+			next:         next,
+		}
+	})
+
+	r.Handle("/*", fileServer)
+
+	return nil
+}
+
 // Serve starts an HTTP server that serves templates and assets from the given directory.
 // It uses os.DirFS to create a filesystem rooted at the specified directory.
 // The server provides:
@@ -48,40 +98,23 @@ func New() *cli.Command {
 // - .less file compilation via lessgo middleware
 // - Directory listing and file serving for all other files.
 func Serve(ctx context.Context, dir string, addr string) error {
-	absDir, err := filepath.Abs(dir)
+	module, err := NewModule(dir)
 	if err != nil {
-		return fmt.Errorf("invalid directory: %w", err)
+		return err
 	}
 
-	if _, err := os.Stat(absDir); err != nil {
-		return fmt.Errorf("directory not accessible: %w", err)
+	opts := platform.NewOptions()
+	opts.ServerAddr = addr
+
+	p := platform.New(opts)
+	p.Register(module)
+
+	if err := p.Start(context.Background()); err != nil {
+		return err
 	}
 
-	dirFS := os.DirFS(absDir)
-
-	// Create router with middleware stack
-	mux := chi.NewRouter()
-
-	// File server with directory listing
-	fileServer := http.FileServer(http.FS(dirFS))
-
-	// Apply middleware in reverse order of application
-	// lessgo middleware for .less files
-	mux.Use(lessgo.NewMiddleware(dirFS, "/"))
-
-	// vuego middleware for .vuego files (wrapped to pass through to file server)
-	mux.Use(func(next http.Handler) http.Handler {
-		return &vuegoMiddleware{
-			vuegoHandler: server.Middleware(dirFS, server.WithLoadOption(vuego.WithLessProcessor())),
-			next:         next,
-		}
-	})
-
-	// File server with directory listing as final handler
-	mux.Handle("/*", fileServer)
-
-	log.Printf("Serving %s on http://localhost%s", absDir, addr)
-	return http.ListenAndServe(addr, mux)
+	p.Wait()
+	return nil
 }
 
 // vuegoMiddleware wraps the vuego handler and falls through to the next handler

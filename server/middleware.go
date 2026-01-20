@@ -21,9 +21,9 @@ type middlewareConfig struct {
 }
 
 // WithLoadOption adds a LoadOption to the middleware's Vue instance.
-func WithLoadOption(opt vuego.LoadOption) MiddlewareOption {
+func WithLoadOption(opt ...vuego.LoadOption) MiddlewareOption {
 	return func(cfg *middlewareConfig) {
-		cfg.loadOptions = append(cfg.loadOptions, opt)
+		cfg.loadOptions = append(cfg.loadOptions, opt...)
 	}
 }
 
