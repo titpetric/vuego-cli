@@ -28,7 +28,11 @@ func New() *cli.Command {
 			flag.StringVar(&contentPath, "content", "", "Path to tour content directory (uses embedded if not specified)")
 		},
 		Run: func(ctx context.Context, args []string) error {
-			return Serve(ctx, addr, contentPath)
+			dir := ""
+			if len(args) > 0 {
+				dir = args[0]
+			}
+			return Serve(ctx, addr, dir)
 		},
 	}
 }
