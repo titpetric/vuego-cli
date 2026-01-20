@@ -4,6 +4,7 @@ go 1.25.5
 
 require (
 	github.com/go-chi/chi/v5 v5.2.4
+	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
 	github.com/titpetric/cli v0.2.4
