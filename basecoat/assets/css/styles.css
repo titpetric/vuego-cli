@@ -1,0 +1,6 @@
+@import "./custom.css";
+@import "./highlight.css";
+
+@import "./themes/claude.css";
+@import "./themes/doom-64.css";
+@import "./themes/supabase.css";

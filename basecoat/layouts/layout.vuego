@@ -1,0 +1,14 @@
+---
+layout: base
+---
+<vuego include="partials/sidebar.vuego" :menu="menu"></vuego>
+
+<main id="content">
+  <header class="bg-background sticky inset-x-0 top-0 isolate flex shrink-0 items-center gap-2 border-b z-10">
+    <vuego include="partials/header.vuego">
+    </vuego>
+  </header>
+
+  <div class="p-4 md:p-6 xl:p-12" v-html="content">
+  </div>
+</main>

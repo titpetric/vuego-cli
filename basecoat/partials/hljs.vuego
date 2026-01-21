@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/html.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/bash.min.js"></script>
+<script>
+const highlight = () => {
+      if (!window.hljs) return;
+      document
+        .querySelectorAll('pre code:not([data-highlighted]), code.highlight:not([data-highlighted])')
+        .forEach(el => hljs.highlightElement(el));
+    };
+
+    if (!window._hljsInit) {
+      window._hljsInit = true;
+      document.addEventListener('DOMContentLoaded', highlight);
+      document.addEventListener('htmx:afterSwap', highlight);
+    }
+</script>
+<script>
+document.addEventListener('htmx:historyRestore', () => {
+      if (window.basecoat) window.basecoat.initAll();
+    });
+</script>

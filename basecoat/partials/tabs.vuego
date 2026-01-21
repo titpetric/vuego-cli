@@ -1,0 +1,26 @@
+<script>
+document.addEventListener('click', (e) => {
+  const tab = e.target.closest('[role="tab"]');
+  if (!tab) return;
+
+  const tablist = tab.closest('[role="tablist"]');
+  if (!tablist) return;
+
+  // Deselect all tabs in the group
+  tablist.querySelectorAll('[role="tab"]').forEach((t) => {
+    t.setAttribute('aria-selected', 'false');
+    t.setAttribute('tabindex', '-1');
+  });
+
+  // Select the clicked tab
+  tab.setAttribute('aria-selected', 'true');
+  tab.setAttribute('tabindex', '0');
+
+  // Hide all panels and show the selected one
+  const panelId = tab.getAttribute('aria-controls');
+  const tabsContainer = tablist.closest('.tabs');
+  tabsContainer.querySelectorAll('[role="tabpanel"]').forEach((p) => {
+    p.hidden = p.id !== panelId;
+  });
+});
+</script>

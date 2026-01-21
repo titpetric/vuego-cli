@@ -1,0 +1,129 @@
+title: Basecoat UI
+description: A components library built with Bootstrap CSS that works with any web stack.
+heroTitle: All of the shadcn/ui magic, none of the React
+heroDescription: A components library built with Bootstrap CSS that works with any web stack.
+
+teamMembers:
+  - name: Sofia Davis
+    email: m@example.com
+    avatar: https://placehold.co/256x256
+    role: owner
+    roles:
+      - value: viewer
+        label: Viewer
+      - value: developer
+        label: Developer
+      - value: billing
+        label: Billing
+      - value: owner
+        label: Owner
+  - name: Jackson Lee
+    email: p@example.com
+    avatar: https://placehold.co/256x256
+    role: ""
+    roles:
+      - value: ""
+        label: Empty
+      - value: viewer
+        label: Viewer
+      - value: developer
+        label: Developer
+      - value: billing
+        label: Billing
+      - value: owner
+        label: Owner
+  - name: Isabella Nguyen
+    email: i@example.com
+    avatar: https://placehold.co/256x256
+    role: viewer
+    roles:
+      - value: viewer
+        label: Viewer
+      - value: developer
+        label: Developer
+      - value: billing
+        label: Billing
+      - value: owner
+        label: Owner
+
+cookieSettings:
+  - name: Strictly Necessary
+    description: These cookies are essential in order to use the website and use its features.
+    checked: true
+  - name: Functional Cookies
+    description: These cookies allow the website to provide personalized functionality.
+    checked: false
+  - name: Performance Cookies
+    description: These cookies help to improve the performance of the website.
+    checked: false
+
+months:
+  - value: "01"
+    label: January
+  - value: "02"
+    label: February
+  - value: "03"
+    label: March
+  - value: "04"
+    label: April
+  - value: "05"
+    label: May
+  - value: "06"
+    label: June
+  - value: "07"
+    label: July
+  - value: "08"
+    label: August
+  - value: "09"
+    label: September
+  - value: "10"
+    label: October
+  - value: "11"
+    label: November
+  - value: "12"
+    label: December
+
+years:
+  - "2024"
+  - "2025"
+  - "2026"
+  - "2027"
+  - "2028"
+  - "2029"
+  - "2030"
+  - "2031"
+  - "2032"
+  - "2033"
+  - "2034"
+
+chatMessages:
+  - text: "Hi, how can I help you today?"
+    isUser: false
+  - text: "Hey, I'm having trouble with my account."
+    isUser: true
+  - text: "What seems to be the problem?"
+    isUser: false
+  - text: "I can't log in."
+    isUser: true
+
+issueAreas:
+  - value: team
+    label: Team
+  - value: billing
+    label: Billing
+  - value: account
+    label: Account
+  - value: deployments
+    label: Deployments
+  - value: support
+    label: Support
+
+severityLevels:
+  - value: "1"
+    label: Severity 1 (Highest)
+  - value: "2"
+    label: Severity 2
+  - value: "3"
+    label: Severity 3
+  - value: "4"
+    label: Severity 4 (Lowest)

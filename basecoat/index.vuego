@@ -1,0 +1,247 @@
+---
+layout: layout
+---
+
+<div class="container py-4">
+  <header class="mb-4">
+    <div class="mb-3">
+      <h1 class="display-5 fw-bold">{{ heroTitle }}</h1>
+      <p class="lead text-secondary">{{ heroDescription }}</p>
+    </div>
+    <div class="d-flex gap-2 pt-2">
+      <a class="btn btn-primary" href="/installation">Get Started</a>
+      <a class="btn btn-outline-secondary" href="/introduction">Learn more</a>
+    </div>
+  </header>
+
+  <section class="row g-4 mt-4">
+    <div class="col-12 col-lg-6">
+      <div class="d-flex flex-column gap-4">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h5 mb-1">Team Members</h2>
+            <p class="card-text text-secondary small mb-0">Invite your team members to collaborate.</p>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mb-0">
+              <li v-for="(idx, member) in teamMembers" class="d-flex align-items-center gap-3 mb-3">
+                <img v-bind:src="member.avatar" v-bind:alt="member.name" class="rounded-circle" style="width: 40px; height: 40px;">
+                <div class="flex-grow-1">
+                  <h3 class="h6 mb-0">{{ member.name }}</h3>
+                  <p class="small text-secondary mb-0">{{ member.email }}</p>
+                </div>
+                <select class="form-select form-select-sm" style="width: auto;">
+                  <option v-for="role in member.roles" v-bind:value="role.value" v-bind:selected="role.value == member.role">{{ role.label }}</option>
+                </select>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h5 mb-1">Cookie Settings</h2>
+            <p class="card-text text-secondary small mb-0">Manage your cookie settings here.</p>
+          </div>
+          <div class="card-body">
+            <div v-for="(idx, setting) in cookieSettings" class="d-flex align-items-center justify-content-between gap-3 mb-3">
+              <div>
+                <div class="fw-medium">{{ setting.name }}</div>
+                <div class="small text-secondary">{{ setting.description }}</div>
+              </div>
+              <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input" role="switch" v-bind:checked="setting.checked">
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="button" class="btn btn-outline-secondary w-100">Save preferences</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h5 mb-1">Payment Method</h2>
+            <p class="card-text text-secondary small mb-0">Add a new payment method to your account.</p>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="row g-3 mb-3">
+                <div class="col-4">
+                  <input type="radio" class="btn-check" name="payment-method-type" id="payment-method-card" autocomplete="off">
+                  <label class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3" for="payment-method-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
+                    Card
+                  </label>
+                </div>
+                <div class="col-4">
+                  <input type="radio" class="btn-check" name="payment-method-type" id="payment-method-paypal" autocomplete="off">
+                  <label class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3" for="payment-method-paypal">
+                    <svg role="img" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="mb-2"><title>PayPal</title><path d="M7.016 19.198h-4.2a.562.562 0 0 1-.555-.65L5.093.584A.692.692 0 0 1 5.776 0h7.222c3.417 0 5.904 2.488 5.846 5.5-.006.25-.027.5-.066.747A6.794 6.794 0 0 1 12.071 12H8.743a.69.69 0 0 0-.682.583l-.325 2.056-.013.083-.692 4.39-.015.087zM19.79 6.142c-.01.087-.01.175-.023.261a7.76 7.76 0 0 1-7.695 6.598H9.007l-.283 1.795-.013.083-.692 4.39-.134.843-.014.088H6.86l-.497 3.15a.562.562 0 0 0 .555.65h3.612c.34 0 .63-.249.683-.585l.952-6.031a.692.692 0 0 1 .683-.584h2.126a6.793 6.793 0 0 0 6.707-5.752c.306-1.95-.466-3.744-1.89-4.906z"></path></svg>
+                    Paypal
+                  </label>
+                </div>
+                <div class="col-4">
+                  <input type="radio" class="btn-check" name="payment-method-type" id="payment-method-apple" autocomplete="off">
+                  <label class="btn btn-outline-secondary w-100 d-flex flex-column align-items-center py-3" for="payment-method-apple">
+                    <svg role="img" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="mb-2"><title>Apple</title><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"></path></svg>
+                    Apple Pay
+                  </label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="payment-method-name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="payment-method-name" placeholder="John Doe">
+              </div>
+              <div class="mb-3">
+                <label for="payment-method-city" class="form-label">City</label>
+                <input type="text" class="form-control" id="payment-method-city" placeholder="New York">
+              </div>
+              <div class="mb-3">
+                <label for="payment-method-card-number" class="form-label">Card Number</label>
+                <input type="text" class="form-control" id="payment-method-card-number" placeholder="1234 5678 9012 3456">
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col">
+                  <label for="payment-method-expiration-month" class="form-label">Expires</label>
+                  <select id="payment-method-expiration-month" class="form-select">
+                    <option v-for="month in months" v-bind:value="month.value">{{ month.label }}</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label for="payment-method-expiration-year" class="form-label">Year</label>
+                  <select id="payment-method-expiration-year" class="form-select">
+                    <option v-for="year in years" v-bind:value="year">{{ year }}</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label for="payment-method-cvv" class="form-label">CVV</label>
+                  <input type="text" class="form-control" id="payment-method-cvv" placeholder="123" maxlength="4">
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary w-100">Continue</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      <div class="d-flex flex-column gap-4">
+
+	<template :chat="teamMembers.0">
+
+        <div class="card">
+          <div class="card-body">
+            <header class="d-flex align-items-center gap-3 mb-4">
+              <img :src="chat.avatar" :alt="chat.name" class="rounded-circle" style="width: 40px; height: 40px;">
+              <div class="flex-grow-1">
+                <h3 class="h6 mb-0">{{ chat.name }}</h3>
+                <p class="small text-secondary mb-0">{{ chat.email }}</p>
+              </div>
+              <button type="button" class="btn btn-outline-secondary btn-sm rounded-circle" title="New message" style="width: 32px; height: 32px; padding: 0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
+              </button>
+            </header>
+            <section class="mb-4">
+              <div v-for="(idx, message) in chatMessages" class="mb-2">
+                <div v-if="message.isUser" class="d-flex justify-content-end">
+                  <div class="bg-primary text-white rounded px-3 py-2 small" style="max-width: 75%;">{{ message.text }}</div>
+                </div>
+                <div v-else>
+                  <div class="bg-light rounded px-3 py-2 small" style="max-width: 75%;">{{ message.text }}</div>
+                </div>
+              </div>
+            </section>
+            <footer class="d-flex gap-2">
+              <input type="text" class="form-control" placeholder="Type your message here...">
+              <button type="button" class="btn btn-primary" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg>
+              </button>
+            </footer>
+          </div>
+        </div>
+
+	</template>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h5 mb-1">Create an account</h2>
+            <p class="card-text text-secondary small mb-0">Enter your email below to create your account</p>
+          </div>
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <button type="button" class="btn btn-outline-secondary w-100">
+                  <svg role="img" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="me-2"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>
+                  GitHub
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button" class="btn btn-outline-secondary w-100">
+                  <svg role="img" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="me-2"><title>Google</title><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"></path></svg>
+                  Google
+                </button>
+              </div>
+            </div>
+            <div class="position-relative my-4">
+              <hr>
+              <span class="position-absolute top-50 start-50 translate-middle bg-white px-2 small text-uppercase text-secondary">Or continue with</span>
+            </div>
+            <form>
+              <div class="mb-3">
+                <label for="demo-card-form-email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="demo-card-form-email">
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="demo-card-form-password" class="form-label mb-0">Password</label>
+                  <a href="#" class="small">Forgot your password?</a>
+                </div>
+                <input type="password" class="form-control" id="demo-card-form-password">
+              </div>
+              <button type="button" class="btn btn-primary w-100">Create an account</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h5 mb-1">Report an issue</h2>
+            <p class="card-text text-secondary small mb-0">What area are you having problems with?</p>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <label for="report-issue-area" class="form-label">Area</label>
+                  <select id="report-issue-area" class="form-select">
+                    <option v-for="area in issueAreas" v-bind:value="area.value">{{ area.label }}</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <label for="report-issue-security-level" class="form-label">Security Level</label>
+                  <select id="report-issue-security-level" class="form-select">
+                    <option v-for="level in severityLevels" v-bind:value="level.value">{{ level.label }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="report-issue-subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="report-issue-subject" placeholder="I need help with...">
+              </div>
+              <div class="mb-3">
+                <label for="report-issue-description" class="form-label">Description</label>
+                <textarea class="form-control" id="report-issue-description" placeholder="Please include all information relevant to your issue." rows="3"></textarea>
+              </div>
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-link text-secondary">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

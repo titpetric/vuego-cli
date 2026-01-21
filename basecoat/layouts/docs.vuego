@@ -1,0 +1,22 @@
+<template :required="content">
+  <div class="flex min-h-screen">
+    <aside class="hidden lg:flex w-64 flex-col border-r bg-muted/30 p-4" v-if="sidebar">
+      <nav class="space-y-1">
+        <a v-for="item in sidebar" v-bind:href="item.href" class="block px-3 py-2 rounded-md text-sm hover:bg-muted" v-bind:class="item.active ? 'bg-muted font-medium' : 'text-muted-foreground'">{{ item.label }}</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 md:p-8 lg:p-12">
+      <div class="max-w-3xl">
+        <header class="mb-8" v-if="title">
+          <h1 class="text-3xl font-bold tracking-tight">{{ title }}</h1>
+
+          <p class="text-lg text-muted-foreground mt-2" v-if="subtitle">{{ subtitle }}</p>
+        </header>
+
+        <article class="prose" v-html="content">
+        </article>
+      </div>
+    </main>
+  </div>
+</template>

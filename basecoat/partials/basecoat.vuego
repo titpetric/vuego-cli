@@ -1,0 +1,8 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10/dist/basecoat.cdn.min.css">
+<script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10/dist/js/all.min.js" defer></script>
+<style>
+.dark\:block { display: none; }
+.dark .dark\:block { display: block; }
+.dark\:hidden { display: block; }
+.dark .dark\:hidden { display: none; }
+</style>
