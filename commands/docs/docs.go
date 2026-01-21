@@ -40,7 +40,7 @@ func Serve(ctx context.Context, addr string, contentPath string) error {
 
 	log.Printf("Serving docs from: %s", contentPath)
 	contentFS := os.DirFS(contentPath)
-	docsModule := NewModule(contentFS, contentPath)
+	docsModule := NewModule(contentFS)
 
 	p := platform.New(opts)
 	p.Register(docsModule)
