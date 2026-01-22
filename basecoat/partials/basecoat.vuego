@@ -1,8 +1,8 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10/dist/basecoat.cdn.min.css">
-<script src="https://cdn.jsdelivr.net/npm/basecoat-css@0.3.10/dist/js/all.min.js" defer></script>
-<style>
-.dark\:block { display: none; }
-.dark .dark\:block { display: block; }
-.dark\:hidden { display: block; }
-.dark .dark\:hidden { display: none; }
-</style>
+  <script src="/assets/js/basecoat.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/command.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/dropdown-menu.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/popover.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/select.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/sidebar.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/tabs.js?v={{ pkg.version }}" defer></script>
+  <script src="/assets/js/toast.js?v={{ pkg.version }}" defer></script>

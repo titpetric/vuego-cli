@@ -37,7 +37,7 @@ func TestRender_YAMLData(t *testing.T) {
 
 func TestRender_AdditionalFiles(t *testing.T) {
 	req := server.RenderRequest{
-		Template: `<vuego include="partial.vuego"></vuego>`,
+		Template: `<template include="partial.vuego"></template>`,
 		Files: map[string]string{
 			"partial.vuego": `<span>Included</span>`,
 		},

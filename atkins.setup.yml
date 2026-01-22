@@ -1,0 +1,9 @@
+name: Setup jobs for dev/CI tooling
+
+jobs:
+  tailwindcss:
+    passthru: true
+    steps:
+      - curl -o /usr/local/bin/tailwindcss -sL https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+      - chmod +x /usr/local/bin/tailwindcss
+      - tailwindcss --help | head -n 1

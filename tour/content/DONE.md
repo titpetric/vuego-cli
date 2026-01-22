@@ -11,7 +11,7 @@ Throughout this tour, you've explored the core features of Vuego:
 - **Filters** - Transforming values with pipes like `{{ name | upper | trim }}`
 - **Directives** - Controlling flow with `v-for`, `v-if`, `v-else`, and `v-show`
 - **Attribute Binding** - Dynamic attributes with `:attr="value"` or `v-bind:attr="value"`
-- **Components** - Building reusable templates with `<vuego include="...">`, slots, and layouts
+- **Components** - Building reusable templates with `<template include="...">`, slots, and layouts
 
 ## Next steps
 

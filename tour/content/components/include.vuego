@@ -1,5 +1,5 @@
 <div>
   <h1>{{ pageTitle }}</h1>
-  <vuego include="header.vuego"></vuego>
+  <template include="header.vuego"></template>
   <p>Main content here.</p>
 </div>

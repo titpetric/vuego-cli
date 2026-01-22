@@ -23,6 +23,20 @@ jobs:
       - go fmt ./...
       - go mod tidy
 
+  generate:
+    desc: "Generate Tailwind CSS"
+    # choose a container environment (Node image)
+    image: node:20-alpine
+    passthru: true
+    steps:
+      - run: tailwindcss --map
+             -i basecoat/assets/css/tailwind.input.css
+             -o basecoat/assets/css/tailwind.css
+
+  tailwind:setup:
+    steps:
+      - npm install -D tailwindcss@3 postcss autoprefixer
+
   test:
     desc: "Run tests"
     passthru: true
@@ -71,3 +85,7 @@ jobs:
     depends_on: release
     steps:
       - ./ci/release.yml publish
+
+  clean:
+    steps:
+      - rm bin/vuego* -f

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"errors"
 	"fmt"
 	"io/fs"
-	"maps"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -27,19 +27,43 @@ type Module struct {
 	platform.UnimplementedModule
 
 	vuego vuego.Template
-	data  map[string]any
 
 	FS        fs.FS
 	indexTmpl string
-	docTmpl   string
+}
+
+// handler wraps an error-returning handler function with platform error handling.
+func handler(fn func(http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := fn(w, r); err != nil {
+			status := http.StatusInternalServerError
+			var statusErr statusError
+			if errors.As(err, &statusErr) {
+				status = statusErr.status
+			}
+			platform.Error(w, r, status, err)
+		}
+	}
+}
+
+type statusError struct {
+	status int
+	err    error
+}
+
+func (e statusError) Error() string { return e.err.Error() }
+
+func (e statusError) Unwrap() error { return e.err }
+
+func notFound(err error) error {
+	return statusError{status: http.StatusNotFound, err: err}
 }
 
 // NewModule creates a new docs module with a filesystem.
 func NewModule(contentFS fs.FS) *Module {
 	return &Module{
 		FS:    contentFS,
-		vuego: vuego.NewFS(contentFS, vuego.WithLessProcessor(), vuego.WithComponents()),
-		data:  make(map[string]any),
+		vuego: vuego.NewFS(contentFS, vuego.WithLessProcessor()),
 	}
 }
 
@@ -50,56 +74,45 @@ func (m *Module) Name() string {
 
 // Mount registers the docs routes.
 func (m *Module) Mount(_ context.Context, r platform.Router) error {
-	// Load shared vuego data state
-	m.fill(&m.data)
-	m.vuego.Fill(m.data)
-
-	// Load templates
+	// Load embedded index template
 	indexData, err := embeddedTemplates.ReadFile("templates/index.vuego")
 	if err != nil {
 		return fmt.Errorf("loading index template: %w", err)
 	}
 	m.indexTmpl = string(indexData)
 
-	docData, err := embeddedTemplates.ReadFile("templates/doc.vuego")
-	if err != nil {
-		return fmt.Errorf("loading doc template: %w", err)
-	}
-	m.docTmpl = string(docData)
-
-	r.Get("/", m.serveIndex)
-	//r.Get("/assets/*", StaticFS(m.FS))
+	r.Get("/", handler(m.serveIndex))
 	r.Get("/assets/*", http.FileServer(http.FS(m.FS)).ServeHTTP)
-	r.Get("/*", m.serveDoc)
+	r.Get("/*", handler(m.serveDoc))
 
 	return nil
 }
 
-func (m *Module) serveIndex(w http.ResponseWriter, r *http.Request) {
+func (m *Module) serveIndex(w http.ResponseWriter, r *http.Request) error {
 	// Check if README.md exists
 	if readme, err := fs.ReadFile(m.FS, "README.md"); err == nil {
-		m.renderDoc(r.Context(), w, "README.md", string(readme))
-		return
+		return m.renderDoc(r.Context(), w, "README.md", string(readme))
 	}
 
 	// Otherwise show directory listing
-	m.renderDirListing(r.Context(), w, ".")
+	return m.renderDirListing(r.Context(), w, ".")
 }
 
-func (m *Module) serveDoc(w http.ResponseWriter, r *http.Request) {
+func (m *Module) serveDoc(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
 	urlPath := chi.URLParam(r, "*")
+	urlPath = strings.TrimSuffix(urlPath, "/")
 	if urlPath == "" {
 		urlPath = "."
 	}
 
 	// Try .vuego file first (exact match)
 	if strings.HasSuffix(urlPath, ".vuego") {
-		if content, err := fs.ReadFile(m.FS, urlPath); err == nil {
-			m.renderVuego(ctx, w, urlPath, string(content))
+		if _, err := fs.Stat(m.FS, urlPath); err != nil {
+			return notFound(err)
 		}
-		return
+		return m.renderVuego(ctx, w, urlPath)
 	}
 
 	// Try .md file
@@ -110,24 +123,21 @@ func (m *Module) serveDoc(w http.ResponseWriter, r *http.Request) {
 
 	if strings.HasSuffix(mdPath, ".md") {
 		if content, err := fs.ReadFile(m.FS, mdPath); err == nil {
-			m.renderDoc(ctx, w, mdPath, string(content))
-			return
+			return m.renderDoc(ctx, w, mdPath, string(content))
 		}
 	}
 
 	// Try as directory with README.md
 	if readme, err := fs.ReadFile(m.FS, path.Join(urlPath, "README.md")); err == nil {
-		m.renderDoc(ctx, w, path.Join(urlPath, "README.md"), string(readme))
-		return
+		return m.renderDoc(ctx, w, path.Join(urlPath, "README.md"), string(readme))
 	}
 
 	// Try directory listing
 	if entries, err := fs.ReadDir(m.FS, urlPath); err == nil && len(entries) > 0 {
-		m.renderDirListing(ctx, w, urlPath)
-		return
+		return m.renderDirListing(ctx, w, urlPath)
 	}
 
-	http.NotFound(w, r)
+	return notFound(fmt.Errorf("not found: %s", urlPath))
 }
 
 // DocMeta represents frontmatter metadata for a doc.
@@ -137,14 +147,11 @@ type DocMeta struct {
 	Layout   string `yaml:"layout"`
 }
 
-func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath string, content string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
+func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath string, content string) error {
 	// Parse frontmatter
 	meta, body, err := parseFrontmatter(content)
 	if err != nil {
-		http.Error(w, "Error parsing doc: "+err.Error(), http.StatusInternalServerError)
-		return
+		return fmt.Errorf("parsing doc: %w", err)
 	}
 
 	// Get directory for relative file lookups
@@ -152,19 +159,34 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 
 	// Build HTML directly to preserve DOCTYPE, html, head, body tags
 	// Start with global data from data/*.yml files, then add doc-specific data
-	data := maps.Clone(m.data)
-	data["title"] = meta.Title
-	data["subtitle"] = meta.Subtitle
-	data["description"] = meta.Subtitle
-	data["content"] = m.parseDirectives(ctx, body, docDir)
+	data := map[string]any{
+		"title":       meta.Title,
+		"subtitle":    meta.Subtitle,
+		"description": meta.Subtitle,
+		"content":     m.parseDirectives(ctx, body, docDir),
+	}
+
+	m.fill(&data)
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// compute layout path for the doc
+	layoutName := "page"
+	if meta.Layout != "" {
+		layoutName = meta.Layout
+	}
+	layout := layoutName
+	if !strings.Contains(layoutName, ".vuego") {
+		layout = "layouts/" + layout + ".vuego"
+	}
 
 	var buf bytes.Buffer
-	if err := m.vuego.Load("layouts/page.vuego").Fill(data).Render(ctx, &buf); err != nil {
-		http.Error(w, "Error rendering layout: "+err.Error(), http.StatusInternalServerError)
-		return
+	if err := m.vuego.Load(layout).Fill(data).Render(ctx, &buf); err != nil {
+		return fmt.Errorf("rendering layout: %w", err)
 	}
 
 	_, _ = w.Write(buf.Bytes())
+	return nil
 }
 
 func (m *Module) fill(dest *map[string]any) {
@@ -187,33 +209,32 @@ func (m *Module) scan(dest *map[string]any, filename string) {
 	_ = yaml.Unmarshal(content, dest)
 }
 
-func (m *Module) renderVuego(ctx context.Context, w http.ResponseWriter, filePath string, content string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
+func (m *Module) renderVuego(ctx context.Context, w http.ResponseWriter, filePath string) error {
 	// Load sidecar data file
 	baseName := strings.TrimSuffix(filePath, filepath.Ext(filePath))
+
 	var data map[string]any
 	for _, ext := range []string{".yaml", ".yml", ".json"} {
 		m.scan(&data, baseName+ext)
 	}
 
-	// Render the vuego template
+	m.fill(&data)
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	var buf bytes.Buffer
-	if err := m.vuego.New().Fill(data).RenderString(ctx, &buf, content); err != nil {
-		http.Error(w, "Error rendering vuego: "+err.Error(), http.StatusInternalServerError)
-		return
+	if err := m.vuego.Load(filePath).Fill(data).Render(ctx, &buf); err != nil {
+		return fmt.Errorf("rendering vuego: %w", err)
 	}
 
 	_, _ = w.Write(buf.Bytes())
+	return nil
 }
 
-func (m *Module) renderDirListing(ctx context.Context, w http.ResponseWriter, dir string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
+func (m *Module) renderDirListing(ctx context.Context, w http.ResponseWriter, dir string) error {
 	entries, err := fs.ReadDir(m.FS, dir)
 	if err != nil {
-		http.Error(w, "Cannot list directory", http.StatusInternalServerError)
-		return
+		return fmt.Errorf("listing directory: %w", err)
 	}
 
 	type Entry struct {
@@ -256,13 +277,25 @@ func (m *Module) renderDirListing(ctx context.Context, w http.ResponseWriter, di
 		"entries": items,
 		"path":    dir,
 	}
+	m.fill(&data)
 
-	var buf bytes.Buffer
-	if err := m.vuego.New().Fill(data).RenderString(ctx, &buf, m.indexTmpl); err != nil {
-		http.Error(w, "Error rendering template: "+err.Error(), http.StatusInternalServerError)
-		return
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// Render the inline template content (without layout processing)
+	var contentBuf bytes.Buffer
+	if err := m.vuego.New().Fill(data).RenderString(ctx, &contentBuf, m.indexTmpl); err != nil {
+		return fmt.Errorf("rendering template: %w", err)
 	}
+
+	// Wrap in the base layout
+	data["content"] = contentBuf.String()
+	var buf bytes.Buffer
+	if err := m.vuego.Load("layouts/page.vuego").Fill(data).Render(ctx, &buf); err != nil {
+		return fmt.Errorf("rendering layout: %w", err)
+	}
+
 	_, _ = buf.WriteTo(w)
+	return nil
 }
 
 func (m *Module) readFile(docDir, filePath string) string {
@@ -276,22 +309,18 @@ func (m *Module) readFile(docDir, filePath string) string {
 
 func (m *Module) renderVuegoFile(ctx context.Context, docDir, filePath string) string {
 	fullPath := path.Join(docDir, filePath)
-	content, err := fs.ReadFile(m.FS, fullPath)
-	if err != nil {
-		return fmt.Sprintf("<!-- error reading %s: %v -->", filePath, err)
-	}
 
-	// Load sidecar data file
+	// Load sidecar data file, starting with global data
 	baseName := strings.TrimSuffix(fullPath, filepath.Ext(fullPath))
 	var data map[string]any
 	for _, ext := range []string{".yaml", ".yml", ".json"} {
 		dataPath := baseName + ext
 		m.scan(&data, dataPath)
 	}
+	m.fill(&data)
 
-	// Render vuego template
 	var buf bytes.Buffer
-	if err := m.vuego.New().Fill(data).RenderString(ctx, &buf, string(content)); err != nil {
+	if err := m.vuego.Load(fullPath).Fill(data).Render(ctx, &buf); err != nil {
 		return fmt.Sprintf("<!-- render error: %v -->", err)
 	}
 

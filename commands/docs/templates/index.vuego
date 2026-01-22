@@ -1,35 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+<div class="max-w-4xl mx-auto p-8">
+  <header class="mb-8">
+    <h1 class="text-3xl font-bold">{{ title }}</h1>
+  </header>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ title }}</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@latest/dist/basecoat.cdn.min.css">
-  <link rel="stylesheet" href="/static/docs.css">
-</head>
+  <nav>
+    <ul class="space-y-2">
+      <li v-for="entry in entries">
+        <a v-if="entry.IsDir" v-bind:href="entry.Path" class="flex items-center gap-2 text-primary hover:underline">
+          <span>📁</span>
 
-<body class="bg-background text-foreground">
-  <div class="max-w-4xl mx-auto p-8">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold">{{ title }}</h1>
-    </header>
+          <span>{{ entry.Name }}/</span>
+        </a>
 
-    <nav>
-      <ul class="space-y-2">
-        <li v-for="entry in entries">
-          <a v-if="entry.IsDir" v-bind:href="entry.Path" class="flex items-center gap-2 text-primary hover:underline">
-            <span>📁</span>
-            <span>{{ entry.Name }}/</span>
-          </a>
-          <a v-else v-bind:href="entry.Path" class="flex items-center gap-2 text-foreground hover:text-primary">
-            <span>📄</span>
-            <span>{{ entry.Name }}</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-</body>
+        <a v-else v-bind:href="entry.Path" class="flex items-center gap-2 text-foreground hover:text-primary">
+          <span>📄</span>
 
-</html>
+          <span>{{ entry.Name }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

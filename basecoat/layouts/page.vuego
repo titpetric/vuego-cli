@@ -11,6 +11,6 @@ layout: layout
     <article class="pb-12 mt-8 content" v-html="content"></article>
   </div>
     <div class="hidden text-sm xl:block w-full max-w-[300px]" v-if="toc">
-       <vuego include="partials/toc.vuego"></vuego>
+       <template include="partials/toc.vuego"></template>
     </div>
 </main>

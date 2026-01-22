@@ -2,7 +2,7 @@
 
 ## Include Components
 
-Use `<vuego include="file">` to include another template file.
+Use `<template include="file">` to include another template file.
 
 This is the basic way to compose templates from reusable parts.
 
@@ -52,11 +52,11 @@ Use `v-slot` or the `#` shorthand to receive slot props.
 
 ## Component Shorthands
 
-When component shorthands are enabled, you can use simple tag names instead of `<vuego include>`.
+When component shorthands are enabled, you can use simple tag names instead of `<template include>`.
 
 Component filenames are converted from PascalCase to kebab-case: `ButtonPrimary.vuego` becomes `<button-primary>`.
 
-Attributes on shorthand tags are passed as props to the component. Slot content works the same as with `<vuego include>`.
+Attributes on shorthand tags are passed as props to the component. Slot content works the same as with `<template include>`.
 
 - [Component Shorthands](https://github.com/titpetric/vuego/blob/main/docs/components.md#component-shorthands)
 
