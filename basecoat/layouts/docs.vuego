@@ -1,3 +1,7 @@
+---
+layout: layout
+---
+
 <template :required="content">
   <div class="flex min-h-screen">
     <aside class="hidden lg:flex w-64 flex-col border-r bg-muted/30 p-4" v-if="sidebar">

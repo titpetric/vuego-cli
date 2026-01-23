@@ -1,44 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script>
-(() => {
-      try {
-        const stored = localStorage.getItem('themeMode');
-        if (stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches) {
-          document.documentElement.classList.add('dark');
-        }
-      } catch (_) {}
-
-      document.addEventListener('basecoat:theme', (event) => {
-        const mode = event.detail?.mode;
-        const dark = mode === 'dark' ? true : mode === 'light' ? false : !document.documentElement.classList.contains('dark');
-        document.documentElement.classList.toggle('dark', dark);
-        try { localStorage.setItem('themeMode', dark ? 'dark' : 'light'); } catch (_) {}
-      });
-    })();
-    </script>
-
-    <script>
-(function() {
-      try {
-        const storedTheme = localStorage.getItem('themeVariant');
-        if (storedTheme) document.documentElement.classList.add(`theme-${storedTheme}`);
-      } catch (event) {
-        console.error('Could not apply theme variant from localStorage', event);
-      }
-    })();
-    </script>
+    <template include="partials/theme.vuego"></template>
 
     <meta charset="utf-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta v-if="description" name="description" v-bind:content="description">
 
     <title v-if="title">{{ title }}</title>
-
     <title v-else>Documentation</title>
-
-    <meta v-if="description" name="description" v-bind:content="description">
 
     <link rel="stylesheet" href="/assets/css/styles.css">
 
@@ -46,17 +16,10 @@
     <template include="partials/hljs.vuego"></template>
 
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-
   </head>
-
   <body>
-
     <template v-html="content"></template>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-lucide.createIcons();
-    </script>
+    <template include="partials/footer.vuego"></template>
   </body>
 </html>
