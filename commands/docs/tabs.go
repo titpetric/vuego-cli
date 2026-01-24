@@ -74,7 +74,7 @@ func (m *Module) renderSingleTab(tab Tab) string {
 			mode = "text"
 		}
 		return fmt.Sprintf(
-			`<code class="hljs language-%s"><pre>%s</pre></code>`,
+			`<pre class="grid text-sm max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code class="language-%s !bg-muted/40 !p-3.5">%s</code></pre>`,
 			html.EscapeString(mode),
 			html.EscapeString(tab.Content),
 		)

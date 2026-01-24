@@ -349,6 +349,9 @@
   .h-14 {
     height: calc(var(--spacing) * 14);
   }
+  .max-h-\[650px\] {
+    max-height: 650px;
+  }
   .min-h-\[350px\] {
     min-height: 350px;
   }
@@ -466,6 +469,9 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
   .rounded-full {
     border-radius: calc(infinity * 1px);
   }
@@ -477,6 +483,9 @@
   }
   .rounded-sm {
     border-radius: var(--radius-sm);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
   }
   .border {
     border-style: var(--tw-border-style);
@@ -501,6 +510,12 @@
   .border-muted {
     border-color: var(--color-muted);
   }
+  .\!bg-muted\/40 {
+    background-color: var(--color-muted) !important;
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-muted) 40%, transparent) !important;
+    }
+  }
   .bg-background {
     background-color: var(--color-background);
   }
@@ -521,6 +536,9 @@
   }
   .bg-sidebar-primary {
     background-color: var(--color-sidebar-primary);
+  }
+  .\!p-3\.5 {
+    padding: calc(var(--spacing) * 3.5) !important;
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);

@@ -323,6 +323,9 @@
   .h-14 {
     height: calc(var(--spacing) * 14);
   }
+  .max-h-\[650px\] {
+    max-height: 650px;
+  }
   .min-h-\[350px\] {
     min-height: 350px;
   }
@@ -440,6 +443,9 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
   .rounded-full {
     border-radius: calc(infinity * 1px);
   }
@@ -451,6 +457,9 @@
   }
   .rounded-sm {
     border-radius: var(--radius-sm);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
   }
   .border {
     border-style: var(--tw-border-style);
@@ -471,6 +480,9 @@
   .border-b {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
+  }
+  .\!p-3\.5 {
+    padding: calc(var(--spacing) * 3.5) !important;
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
