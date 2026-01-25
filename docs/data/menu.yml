@@ -1,0 +1,138 @@
+menu:
+  - type: group
+    label: Getting started
+    items:
+      - label: Introduction
+        url: /introduction
+        icon: info
+        attrs: link_attrs
+      - label: Installation
+        url: /installation
+        icon: square-terminal
+        attrs: link_attrs
+      - label: Kitchen sink
+        url: /kitchen-sink
+        icon: layout-dashboard
+        attrs: link_attrs
+      - label: GitHub
+        url: https://github.com/titpetric/vuego
+        icon: github
+        attrs:
+          target: _blank
+  - type: group
+    label: Components
+    items:
+      - label: Accordion
+        url: /components/accordion
+        attrs: link_attrs
+      - label: Alert
+        url: /components/alert
+        attrs: link_attrs
+      - label: Alert Dialog
+        url: /components/alert-dialog
+        attrs: link_attrs
+      - label: Avatar
+        url: /components/avatar
+        attrs: link_attrs
+      - label: Badge
+        url: /components/badge
+        attrs: link_attrs
+      - label: Breadcrumb
+        url: /components/breadcrumb
+        attrs: link_attrs
+      - label: Button
+        url: /components/button
+        attrs: link_attrs
+      - label: Button Group
+        url: /components/button-group
+        attrs: new_link_attrs
+      - label: Card
+        url: /components/card
+        attrs: link_attrs
+      - label: Checkbox
+        url: /components/checkbox
+        attrs: link_attrs
+      - label: Command
+        url: /components/command
+        attrs: new_link_attrs
+      - label: Combobox
+        url: /components/combobox
+        attrs: link_attrs
+      - label: Dialog
+        url: /components/dialog
+        attrs: link_attrs
+      - label: Dropdown Menu
+        url: /components/dropdown-menu
+        attrs: link_attrs
+      - label: Empty
+        url: /components/empty
+        attrs: new_link_attrs
+      - label: Field
+        url: /components/field
+        attrs: new_link_attrs
+      - label: Form
+        url: /components/form
+        attrs: link_attrs
+      - label: Input
+        url: /components/input
+        attrs: link_attrs
+      - label: Input Group
+        url: /components/input-group
+        attrs: new_link_attrs
+      - label: Item
+        url: /components/item
+        attrs: new_link_attrs
+      - label: Kbd
+        url: /components/kbd
+        attrs: new_link_attrs
+      - label: Label
+        url: /components/label
+        attrs: link_attrs
+      - label: Pagination
+        url: /components/pagination
+        attrs: link_attrs
+      - label: Popover
+        url: /components/popover
+        attrs: link_attrs
+      - label: Progress
+        url: /components/progress
+        attrs: new_link_attrs
+      - label: Radio Group
+        url: /components/radio-group
+        attrs: link_attrs
+      - label: Select
+        url: /components/select
+        attrs: link_attrs
+      - label: Sidebar
+        url: /components/sidebar
+        attrs: link_attrs
+      - label: Skeleton
+        url: /components/skeleton
+        attrs: link_attrs
+      - label: Slider
+        url: /components/slider
+        attrs: link_attrs
+      - label: Spinner
+        url: /components/spinner
+        attrs: new_link_attrs
+      - label: Switch
+        url: /components/switch
+        attrs: link_attrs
+      - label: Table
+        url: /components/table
+        attrs: link_attrs
+      - label: Tabs
+        url: /components/tabs
+        attrs: link_attrs
+      - label: Textarea
+        url: /components/textarea
+        attrs: link_attrs
+      - label: Theme Switcher
+        url: /components/theme-switcher
+        attrs: link_attrs
+      - label: Toast
+        url: /components/toast
+        attrs: link_attrs
+      - label: Tooltip
+        url: /components/tooltip
+        attrs: link_attrs
