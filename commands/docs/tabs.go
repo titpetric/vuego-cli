@@ -74,10 +74,10 @@ func (m *Module) renderSingleTab(tab Tab) string {
 			mode = "text"
 		}
 		return fmt.Sprintf(
-			`<pre class="grid text-sm max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code class="language-%s !bg-muted/40 !p-3.5">%s</code></pre>`,
+			`<pre class="grid text-sm min-h-[150px] max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code class="language-%s !bg-muted/40 !p-3.5">%s</code></pre>`,
 			html.EscapeString(mode),
 			html.EscapeString(tab.Content),
 		)
 	}
-	return fmt.Sprintf(`<div class="preview flex min-h-[350px] w-full justify-center p-10 items-center">%s</div>`, tab.Content)
+	return fmt.Sprintf(`<div class="preview flex min-h-[150px] max-h-[650px] w-full justify-center p-10 items-center">%s</div>`, tab.Content)
 }

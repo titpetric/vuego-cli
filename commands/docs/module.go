@@ -17,6 +17,8 @@ import (
 	"github.com/titpetric/platform"
 	"github.com/titpetric/vuego"
 	yaml "gopkg.in/yaml.v3"
+
+	"github.com/titpetric/vuego-cli/basecoat"
 )
 
 //go:embed templates
@@ -61,9 +63,10 @@ func notFound(err error) error {
 
 // NewModule creates a new docs module with a filesystem.
 func NewModule(contentFS fs.FS) *Module {
+	ofs := vuego.NewOverlayFS(contentFS, basecoat.FS)
 	return &Module{
-		FS:    contentFS,
-		vuego: vuego.NewFS(contentFS, vuego.WithLessProcessor()),
+		FS:    ofs,
+		vuego: vuego.NewFS(ofs, vuego.WithLessProcessor()),
 	}
 }
 

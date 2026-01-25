@@ -51,7 +51,7 @@
         <span class="block dark:hidden"><i data-lucide="moon"></i></span>
   </button>
   <a
-    href="https://github.com/hunvreus/basecoat"
+    href="https://github.com/titpetric/vuego-cli"
     class="btn-icon size-8"
     target="_blank"
     rel="noopener noreferrer"
