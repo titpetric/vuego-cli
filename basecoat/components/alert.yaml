@@ -1,4 +1,4 @@
 title: "Success! Your changes have been saved"
 description: "This is an alert with icon, title and description."
-icon: '<circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />'
+icon: 'ticket-x'
 class: ""

@@ -6,8 +6,8 @@ layout: page
 
 @tabs
 @render "Preview" alert-demo.vuego
-@file "Code" alert.vuego
-@file "Data" alert.yaml
+@file "Code" alert-demo.vuego
+@file "Data" alert-demo.yaml
 
 ## Usage
 
