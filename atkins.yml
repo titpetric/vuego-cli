@@ -25,13 +25,8 @@ jobs:
 
   generate:
     desc: "Generate Tailwind CSS"
-    # choose a container environment (Node image)
-    image: node:20-alpine
     passthru: true
     steps:
-      - run: tailwindcss
-             -i basecoat/assets/css/tailwind.input.css
-             -o basecoat/assets/css/tailwind.css
       - run: tailwindcss
              -i basecoat/assets/css/basecoat.input.css
              -o basecoat/assets/css/basecoat.css
