@@ -1,5 +1,6 @@
 layout: layout
-title: "Success! Your changes have been saved"
-description: "This is an alert with icon, title and description."
-icon: 'ticket-x'
-class: ""
+alert:
+  title: "Success! Your changes have been saved"
+  description: "This is an alert with icon, title and description."
+  icon: 'ticket-x'
+  class: 'alert-destructive'

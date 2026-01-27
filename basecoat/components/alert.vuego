@@ -1,9 +1,9 @@
-<template :required="title">
-  <div role="alert" class="alert" v-bind:class="class">
-    <i v-if="icon" :data-lucide="{{ icon }}"></i>
+<template :required="alert">
+  <div role="alert" :class="alert.class != nil ? alert.class : 'alert'">
+    <i v-if="alert.icon" :data-lucide="{{ alert.icon }}"></i>
 
-    <h2>{{ title }}</h2>
+    <h2>{{ alert.title }}</h2>
 
-    <section v-if="description">{{ description }}</section>
+    <section v-if="alert.description">{{ alert.description }}</section>
   </div>
 </template>
