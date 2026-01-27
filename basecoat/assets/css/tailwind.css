@@ -294,6 +294,9 @@
   .inline-block {
     display: inline-block;
   }
+  .table {
+    display: table;
+  }
   .aspect-square {
     aspect-ratio: 1 / 1;
   }
@@ -326,8 +329,8 @@
   .max-h-\[650px\] {
     max-height: 650px;
   }
-  .min-h-\[350px\] {
-    min-height: 350px;
+  .min-h-\[150px\] {
+    min-height: 150px;
   }
   .min-h-screen {
     min-height: 100vh;
@@ -443,6 +446,9 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
   .overflow-y-auto {
     overflow-y: auto;
   }
@@ -522,6 +528,9 @@
   }
   .text-left {
     text-align: left;
+  }
+  .text-right {
+    text-align: right;
   }
   .text-2xl {
     font-size: var(--text-2xl);

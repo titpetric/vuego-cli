@@ -1,0 +1,83 @@
+layout: layout
+
+container:
+  class: "overflow-x-auto"
+
+table:
+  class: "table"
+  caption: "A list of your recent invoices."
+
+  columns:
+    - key: "col1"
+      label: "Invoice"
+    - key: "col2"
+      label: "Status"
+    - key: "col3"
+      label: "Method"
+    - key: "col4"
+      label: "Amount"
+      headerClass: "text-right"
+
+  body:
+    - cells:
+        - value: "INV001"
+          class: "font-medium"
+        - value: "Paid"
+        - value: "Credit Card"
+        - value: "$250.00"
+          class: "text-right"
+
+    - cells:
+        - value: "INV002"
+          class: "font-medium"
+        - value: "Pending"
+        - value: "PayPal"
+        - value: "$150.00"
+          class: "text-right"
+
+    - cells:
+        - value: "INV003"
+          class: "font-medium"
+        - value: "Unpaid"
+        - value: "Bank Transfer"
+        - value: "$350.00"
+          class: "text-right"
+
+    - cells:
+        - value: "INV004"
+          class: "font-medium"
+        - value: "Paid"
+        - value: "Paypal"
+        - value: "$450.00"
+          class: "text-right"
+
+    - cells:
+        - value: "INV005"
+          class: "font-medium"
+        - value: "Paid"
+        - value: "Credit Card"
+        - value: "$550.00"
+          class: "text-right"
+
+    - cells:
+        - value: "INV006"
+          class: "font-medium"
+        - value: "Pending"
+        - value: "Bank Transfer"
+        - value: "$200.00"
+          class: "text-right"
+
+    - cells:
+        - value: "INV007"
+          class: "font-medium"
+        - value: "Unpaid"
+        - value: "Credit Card"
+        - value: "$300.00"
+          class: "text-right"
+
+  footer:
+    cells:
+      - value: "Total"
+        colspan: 3
+      - value: "$2,500.00"
+        class: "text-right"

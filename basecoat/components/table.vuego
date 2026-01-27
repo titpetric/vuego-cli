@@ -1,0 +1,47 @@
+<template>
+  <div :class="container.class">
+    <table :class="table.class">
+      <caption v-if="table.caption">
+        {{ table.caption }}
+      </caption>
+
+      <thead>
+        <tr>
+          <th
+            v-for="column in table.columns"
+            :class="column.headerClass"
+          >
+            {{ column.label }}
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          v-for="row in table.body"
+          :class="row.class"
+        >
+          <td
+            v-for="cell in row.cells"
+            :class="cell.class"
+          >
+            {{ cell.value }}
+          </td>
+        </tr>
+      </tbody>
+
+      <tfoot v-if="table.footer">
+        <tr>
+          <td
+            v-for="cell in table.footer.cells"
+            :class="cell.class"
+            :colspan="cell.colspan != nil ? cell.colspan : 1"
+          >
+            {{ cell.value }}
+          </td>
+        </tr>
+      </tfoot>
+
+    </table>
+  </div>
+</template>
