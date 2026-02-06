@@ -9,6 +9,8 @@ layout: base
     </template>
   </header>
 
-  <div class="p-4 md:p-6 xl:p-12" v-html="content">
+  <div class="p-4 md:p-6 xl:p-12">
+	<div class="flex gap-x-10 enter" v-html="content">
+     </div>
   </div>
 </main>
