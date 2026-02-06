@@ -49,9 +49,9 @@ func New() *cli.Command {
 
 			switch outputFormat {
 			case "simple":
-				return runSimple(file1, file2, content1, content2, isEqual)
+				return runSimple(content1, content2, file1, file2, isEqual)
 			case "unified":
-				return runUnified(file1, file2, content1, content2, isEqual)
+				return runUnified(content1, content2, file1, file2, isEqual)
 			case "yaml":
 				return runYAML(content1, content2, isEqual)
 			default:
@@ -61,7 +61,7 @@ func New() *cli.Command {
 	}
 }
 
-func runSimple(file1, file2 string, content1, content2 []byte, isEqual bool) error {
+func runSimple(content1, content2 []byte, file1, file2 string, isEqual bool) error {
 	if isEqual {
 		fmt.Printf("✓ %s and %s have equivalent DOM trees\n", file1, file2)
 		return nil
@@ -72,7 +72,7 @@ func runSimple(file1, file2 string, content1, content2 []byte, isEqual bool) err
 	return fmt.Errorf("DOM trees do not match")
 }
 
-func runUnified(file1, file2 string, content1, content2 []byte, isEqual bool) error {
+func runUnified(content1, content2 []byte, file1, file2 string, isEqual bool) error {
 	formatted1, err := diff.FormatToNormalizedHTML(content1)
 	if err != nil {
 		return fmt.Errorf("formatting %s: %w", file1, err)
