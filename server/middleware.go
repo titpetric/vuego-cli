@@ -82,7 +82,7 @@ func (h *middlewareHandler) serveVuego(w http.ResponseWriter, r *http.Request, f
 	}
 
 	// Inject style link for adjacent .css or .less file
-	html, err := injectStyleLink(&buf, filePath, r.URL.Path, h.fs)
+	html, err := injectStyleLink(&buf, h.fs, filePath, r.URL.Path)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to process HTML: %v", err), http.StatusInternalServerError)
 		return
@@ -125,7 +125,7 @@ func MiddlewareDir(dir string, opts ...MiddlewareOption) http.Handler {
 }
 
 // injectStyleLink finds an adjacent .css or .less file (preferring .css) and injects a style link.
-func injectStyleLink(buf *bytes.Buffer, vuegoPath, urlPath string, contentFS fs.FS) (string, error) {
+func injectStyleLink(buf *bytes.Buffer, contentFS fs.FS, vuegoPath, urlPath string) (string, error) {
 	htmlContent := buf.String()
 	basePath := strings.TrimSuffix(vuegoPath, ".vuego")
 	urlBasePath := strings.TrimSuffix(urlPath, ".vuego")

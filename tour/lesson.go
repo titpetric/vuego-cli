@@ -36,9 +36,18 @@ type Lesson struct {
 type Chapter struct {
 	Name    string    // Chapter name (from filename)
 	Title   string    // Chapter title (from # heading or filename)
-	Slug    string    // URL-friendly name (e.g., "interpolation")
 	Lessons []*Lesson // Lessons in this chapter
 	Index   int       // Chapter index (0-based)
+}
+
+// Slug returns the directory name for a chapter (strips numeric prefix).
+// e.g., "01-interpolation" -> "interpolation".
+func (c *Chapter) Slug() string {
+	parts := strings.SplitN(c.Name, "-", 2)
+	if len(parts) == 2 {
+		return parts[1]
+	}
+	return c.Name
 }
 
 // Tour holds all chapters and lessons.
@@ -109,22 +118,21 @@ func parseChapter(contentFS fs.FS, mdFile string, chapterIdx int) (*Chapter, err
 	chapter := &Chapter{
 		Name:  chapterName,
 		Title: chapterName,
-		Slug:  chapterDir(chapterName),
 		Index: chapterIdx,
 	}
 
 	// Parse markdown into lessons (split by --- delimiter)
-	lessons, chapterTitle := parseMarkdownLessons(string(content), chapterName, chapterIdx)
+	lessons, chapterTitle := chapter.parseMarkdownLessons(string(content))
 	if chapterTitle != "" {
 		chapter.Title = chapterTitle
 	}
 
 	// Load files for each lesson from @file references
 	for _, lesson := range lessons {
-		lesson.Files = loadLessonFilesFromRefs(contentFS, chapterName, lesson.FileRefs)
+		lesson.Files = chapter.loadLessonFilesFromRefs(contentFS, lesson.FileRefs)
 		lesson.TotalInChapter = len(lessons)
 		lesson.ChapterTitle = chapter.Title
-		lesson.ChapterSlug = chapterDir(chapterName)
+		lesson.ChapterSlug = chapter.Slug()
 	}
 
 	chapter.Lessons = lessons
@@ -141,9 +149,11 @@ func ValidateTour(t *Tour) error {
 	return nil
 }
 
-func parseMarkdownLessons(content, chapterName string, chapterIdx int) ([]*Lesson, string) {
+func (c *Chapter) parseMarkdownLessons(content string) ([]*Lesson, string) {
 	var lessons []*Lesson
 	var chapterTitle string
+	var chapterName = c.Name
+	var chapterIdx = c.Index
 
 	// Split by lesson delimiter: \n\n---\n\n
 	sections := strings.Split(content, "\n\n---\n\n")
@@ -227,21 +237,11 @@ func extractFileRefs(content string) ([]string, string) {
 	return refs, strings.TrimSpace(strings.Join(cleanLines, "\n"))
 }
 
-// chapterDir returns the directory name for a chapter (strips numeric prefix).
-// e.g., "01-interpolation" -> "interpolation"
-func chapterDir(chapterName string) string {
-	parts := strings.SplitN(chapterName, "-", 2)
-	if len(parts) == 2 {
-		return parts[1]
-	}
-	return chapterName
-}
-
 // loadLessonFilesFromRefs loads files from @file: references.
 // It also implicitly loads data files (.yml, .yaml, .json) based on the primary template name.
-func loadLessonFilesFromRefs(contentFS fs.FS, chapterName string, refs []string) map[string]string {
+func (c *Chapter) loadLessonFilesFromRefs(contentFS fs.FS, refs []string) map[string]string {
 	files := make(map[string]string)
-	dir := chapterDir(chapterName)
+	dir := c.Slug()
 
 	for _, ref := range refs {
 		// Build full path relative to chapter directory (without numeric prefix)
@@ -326,7 +326,7 @@ func (t *Tour) GetLesson(id string) *Lesson {
 func (t *Tour) GetLessonByName(chapterName, lessonIdx string) *Lesson {
 	for _, chapter := range t.Chapters {
 		// Match friendly name to prefixed chapter name
-		if chapterDir(chapter.Name) == chapterName {
+		if chapter.Name == chapterName || chapter.Slug() == chapterName {
 			idx, err := strconv.Atoi(lessonIdx)
 			if err != nil || idx < 0 || idx >= len(chapter.Lessons) {
 				return nil

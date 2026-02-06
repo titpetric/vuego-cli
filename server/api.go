@@ -78,13 +78,13 @@ func Render(ctx context.Context, baseFS fs.FS, req RenderRequest, opts ...vuego.
 	}
 
 	// Build filesystem with template and any additional files
-	templateFS := buildTemplateFS(baseFS, req.Template, req.Files)
+	templateFS := buildTemplateFS(baseFS, req.Files, req.Template)
 
 	// Wrap template with injected styles
-	templateWithStyles := injectStyleLinksIntoTemplate(req.Template, req.Files)
+	templateWithStyles := injectStyleLinksIntoTemplate(req.Files, req.Template)
 
 	// Re-build filesystem with updated template
-	templateFS = buildTemplateFS(baseFS, templateWithStyles, req.Files)
+	templateFS = buildTemplateFS(baseFS, req.Files, templateWithStyles)
 
 	// Render the template
 	renderer := vuego.NewFS(templateFS, opts...)
@@ -100,7 +100,7 @@ func Render(ctx context.Context, baseFS fs.FS, req RenderRequest, opts ...vuego.
 }
 
 // buildTemplateFS creates a filesystem combining the base FS with request files.
-func buildTemplateFS(baseFS fs.FS, template string, files map[string]string) fs.FS {
+func buildTemplateFS(baseFS fs.FS, files map[string]string, template string) fs.FS {
 	primary := fstest.MapFS{
 		"template.html": &fstest.MapFile{Data: []byte(template)},
 	}
@@ -114,35 +114,12 @@ func buildTemplateFS(baseFS fs.FS, template string, files map[string]string) fs.
 		return primary
 	}
 
-	return &combinedFS{
-		primary:   primary,
-		secondary: baseFS,
-	}
-}
-
-// combinedFS implements fs.FS by combining a primary and secondary filesystem.
-type combinedFS struct {
-	primary   fs.FS
-	secondary fs.FS
-}
-
-// Open implements fs.FS by trying the primary filesystem first, then falling back to secondary.
-func (cfs *combinedFS) Open(name string) (fs.File, error) {
-	f, err := cfs.primary.Open(name)
-	if err == nil {
-		return f, nil
-	}
-	return cfs.secondary.Open(name)
-}
-
-// ReadDir implements fs.ReadDirFS for component discovery.
-func (cfs *combinedFS) ReadDir(name string) ([]fs.DirEntry, error) {
-	return fs.ReadDir(cfs.secondary, name)
+	return vuego.NewOverlayFS(primary, baseFS)
 }
 
 // injectStyleLinksIntoTemplate injects style tags directly into the template string.
 // Assumes all files have already been processed (LESS compiled to CSS).
-func injectStyleLinksIntoTemplate(template string, files map[string]string) string {
+func injectStyleLinksIntoTemplate(files map[string]string, template string) string {
 	// For API requests, look for style files in the files map
 	var styleFiles []string
 	for name := range files {

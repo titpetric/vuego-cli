@@ -45,7 +45,7 @@
   <footer v-if="!isDone" class="chapter-nav">
     <strong>Chapters:</strong>
     <template v-for="chapter in chapters">
-      <a v-bind:href="'/lesson/' + chapter.Slug + '/0'">{{ chapter.Title }}</a>
+      <a v-bind:href="'/lesson/' + chapter.Slug() + '/0'">{{ chapter.Title }}</a>
     </template>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.32.2/src-min-noconflict/ace.min.js"></script>
