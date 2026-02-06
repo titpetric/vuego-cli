@@ -2,11 +2,11 @@
 name: Release Vuego CLI binaries
 
 vars:
-  name: vuego-cli
+  name: $(basename $(realpath -s .))
   semver: $(git tag | tail -n 1)
-  image: titpetric/vuego-cli
+  image: titpetric/${{name}}
   build:
-    goarch: [arm64, amd64]
+    goarch: [amd64]
 
 jobs:
   default:
