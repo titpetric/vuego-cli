@@ -1,0 +1,7 @@
+---
+layout: sidebar.vuego
+---
+
+<template #header>
+	<p>Replaced header contents</p>
+</template>
