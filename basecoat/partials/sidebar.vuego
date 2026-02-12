@@ -19,9 +19,9 @@
             </div>
 
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-medium">Basecoat</span>
+              <span class="truncate font-medium">{{ header != nil && header.title != nil && header.title != "" ? header.title : 'Basecoat' }}</span>
 
-              <span class="truncate text-xs text-muted-foreground">Documentation</span>
+              <span class="truncate text-xs text-muted-foreground">{{ header != nil && header.subtitle != nil && header.subtitle != '' ? header.subtitle : 'Documentation' }}</span>
             </div>
           </a>
         </header>

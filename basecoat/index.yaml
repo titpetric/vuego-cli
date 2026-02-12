@@ -3,6 +3,12 @@ description: A components library built with Bootstrap CSS that works with any w
 heroTitle: All of the shadcn/ui magic, none of the React
 heroDescription: A components library built with Bootstrap CSS that works with any web stack.
 
+menu: []
+
+header:
+  title: Basecoat UI
+  subtitle: Demo
+
 teamMembers:
   - name: Sofia Davis
     email: m@example.com

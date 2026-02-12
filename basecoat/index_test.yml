@@ -1,0 +1,7 @@
+menu:
+  - type: group
+    label: Demo
+    items:
+      - label: Slot Override
+        url: /slots
+        icon: layers
