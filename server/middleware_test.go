@@ -127,6 +127,59 @@ func TestLoadDataFile(t *testing.T) {
 	})
 }
 
+func TestMiddleware_NamedSlotHeaderOverride(t *testing.T) {
+	t.Run("header slot uses default when no override", func(t *testing.T) {
+		fs := fstest.MapFS{
+			"partials/header.vuego": &fstest.MapFile{Data: []byte(`<div><slot name="header"><span>Default Badge</span></slot></div>`)},
+			"page.vuego":            &fstest.MapFile{Data: []byte(`<template include="partials/header.vuego"></template>`)},
+		}
+
+		handler := server.Middleware(fs)
+		req := httptest.NewRequest(http.MethodGet, "/page", nil)
+		rec := httptest.NewRecorder()
+
+		handler.ServeHTTP(rec, req)
+
+		require.Equal(t, http.StatusOK, rec.Code)
+		require.Contains(t, rec.Body.String(), "Default Badge")
+	})
+
+	t.Run("header slot is overridden with named slot content", func(t *testing.T) {
+		fs := fstest.MapFS{
+			"partials/header.vuego": &fstest.MapFile{Data: []byte(`<div><slot name="header"><span>Default Badge</span></slot></div>`)},
+			"page.vuego":            &fstest.MapFile{Data: []byte(`<template include="partials/header.vuego"><template v-slot:header><span>Custom Title</span></template></template>`)},
+		}
+
+		handler := server.Middleware(fs)
+		req := httptest.NewRequest(http.MethodGet, "/page", nil)
+		rec := httptest.NewRecorder()
+
+		handler.ServeHTTP(rec, req)
+
+		require.Equal(t, http.StatusOK, rec.Code)
+		require.Contains(t, rec.Body.String(), "Custom Title")
+		require.NotContains(t, rec.Body.String(), "Default Badge")
+	})
+
+	t.Run("header slot override with data variable", func(t *testing.T) {
+		fs := fstest.MapFS{
+			"partials/header.vuego": &fstest.MapFile{Data: []byte(`<div><slot name="header"><span>Default Badge</span></slot></div>`)},
+			"page.vuego":            &fstest.MapFile{Data: []byte(`<template include="partials/header.vuego"><template v-slot:header><span>{{ header.title }}</span></template></template>`)},
+			"page.yml":              &fstest.MapFile{Data: []byte("header:\n  title: My Custom App")},
+		}
+
+		handler := server.Middleware(fs)
+		req := httptest.NewRequest(http.MethodGet, "/page", nil)
+		rec := httptest.NewRecorder()
+
+		handler.ServeHTTP(rec, req)
+
+		require.Equal(t, http.StatusOK, rec.Code)
+		require.Contains(t, rec.Body.String(), "My Custom App")
+		require.NotContains(t, rec.Body.String(), "Default Badge")
+	})
+}
+
 func TestMiddlewareDir(t *testing.T) {
 	t.Run("serves from directory path", func(t *testing.T) {
 		// Use the testdata directory which should contain test fixtures

@@ -108,6 +108,48 @@ func TestRenderHandler_InvalidJSON(t *testing.T) {
 	require.Contains(t, resp.Error, "invalid JSON:")
 }
 
+func TestRender_NamedSlotDefault(t *testing.T) {
+	req := server.RenderRequest{
+		Template: `<template include="sidebar.vuego"></template>`,
+		Files: map[string]string{
+			"sidebar.vuego": `<nav><slot name="header"><span>Basecoat</span></slot></nav>`,
+		},
+	}
+
+	html, err := server.Render(context.Background(), nil, req)
+	require.NoError(t, err)
+	require.Contains(t, html, "Basecoat")
+}
+
+func TestRender_NamedSlotOverride(t *testing.T) {
+	req := server.RenderRequest{
+		Template: `<template include="sidebar.vuego"><template v-slot:header><span>Custom Brand</span></template></template>`,
+		Files: map[string]string{
+			"sidebar.vuego": `<nav><slot name="header"><span>Basecoat</span></slot></nav>`,
+		},
+	}
+
+	html, err := server.Render(context.Background(), nil, req)
+	require.NoError(t, err)
+	require.Contains(t, html, "Custom Brand")
+	require.NotContains(t, html, "Basecoat")
+}
+
+func TestRender_NamedSlotWithData(t *testing.T) {
+	req := server.RenderRequest{
+		Template: `<template include="sidebar.vuego"><template v-slot:header><span>{{ header.title }}</span></template></template>`,
+		Data:     `{"header": {"title": "My App"}}`,
+		Files: map[string]string{
+			"sidebar.vuego": `<nav><slot name="header"><span>Basecoat</span></slot></nav>`,
+		},
+	}
+
+	html, err := server.Render(context.Background(), nil, req)
+	require.NoError(t, err)
+	require.Contains(t, html, "My App")
+	require.NotContains(t, html, "Basecoat")
+}
+
 func TestRender_LayoutWithRelativePath(t *testing.T) {
 	req := server.RenderRequest{
 		Template: `---

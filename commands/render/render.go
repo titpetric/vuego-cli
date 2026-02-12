@@ -58,18 +58,16 @@ func New() *cli.Command {
 				data = make(map[string]any)
 			}
 
-			// Open template file for efficient streaming
-			tplReader, err := os.Open(tplFile)
-			if err != nil {
-				return fmt.Errorf("opening template file: %w", err)
-			}
-			defer tplReader.Close()
-
-			// Load template with data and render directly from file reader
+			// Load template with data and render
+			// Use template's directory as FS root so relative includes work
 			templateFS := os.DirFS(filepath.Dir(tplFile))
 			tmpl := vuego.NewFS(templateFS).Fill(data)
 
-			if err := tmpl.RenderReader(ctx, os.Stdout, tplReader); err != nil {
+			// Load the template by name (relative to template's directory)
+			loadedTmpl := tmpl.Load(filepath.Base(tplFile))
+
+			// Render with layout support enabled
+			if err := loadedTmpl.Render(ctx, os.Stdout); err != nil {
 				return fmt.Errorf("rendering template: %w", err)
 			}
 
