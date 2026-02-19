@@ -1,5 +1,5 @@
 ---
-layout: layout
+layout: default
 ---
 
 <main class="mx-auto relative flex w-full max-w-screen-lg gap-10">

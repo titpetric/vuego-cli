@@ -1,12 +1,11 @@
 ---
 layout: base
 ---
-<template include="partials/sidebar.vuego" :menu="menu" v-slot:header></template>
+<template v-if="menu != nil && len(menu) > 0" include="partials/sidebar.vuego" :menu="menu" v-slot:header></template>
 
 <main id="content">
   <header class="bg-background sticky inset-x-0 top-0 isolate flex shrink-0 items-center gap-2 border-b z-10">
-    <template include="partials/header.vuego">
-    </template>
+    <template include="partials/header.vuego" :sidebar="menu != nil && len(menu) > 0"></template>
   </header>
 
   <div class="p-4 md:p-6 xl:p-12">

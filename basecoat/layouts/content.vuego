@@ -1,0 +1,15 @@
+---
+layout: base
+---
+
+<main id="content">
+  <header class="bg-background sticky inset-x-0 top-0 isolate flex shrink-0 items-center gap-2 border-b z-10">
+    <template include="partials/header.vuego" :sidebar="false"></template>
+  </header>
+
+  <div class="p-4 md:p-6 xl:p-12">
+    <div class="flex gap-x-10 enter">
+      <div class="w-full max-w-4xl mx-auto flex flex-col gap-6" v-html="content"></div>
+    </div>
+  </div>
+</main>
