@@ -62,6 +62,11 @@ jobs:
             CGO_ENABLED: 0
             GOOS: ${{ goos }}
             GOARCH: ${{ goarch }}
+            GIT_TAG: $(git describe --tags 2>/dev/null || echo "dev")
+            GIT_COMMIT: $(git rev-parse HEAD)
+            GIT_TIME: $(git log -1 --format=%ci)
+            GIT_BRANCH: $(git rev-parse --abbrev-ref HEAD)
+            GIT_MODIFIED: $(git status --porcelain | wc -l)
         run: go build -ldflags="-X 'main.Version=${GIT_TAG}' -X 'main.Commit=${GIT_COMMIT}' -X 'main.CommitTime=${GIT_TIME}' -X 'main.Branch=${GIT_BRANCH}' -X 'main.Modified=${GIT_MODIFIED}'" -o bin/${{name}}-${GOOS}-${GOARCH} ${{build.path}}
 
   install:
