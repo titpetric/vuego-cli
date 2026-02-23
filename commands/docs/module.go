@@ -9,14 +9,12 @@ import (
 	"io/fs"
 	"net/http"
 	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/titpetric/platform"
 	"github.com/titpetric/vuego"
-	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/vuego-cli/basecoat"
 )
@@ -169,8 +167,6 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 		"content":     m.parseDirectives(ctx, body, docDir),
 	}
 
-	m.fill(&data)
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// compute layout path for the doc
@@ -192,41 +188,11 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 	return nil
 }
 
-func (m *Module) fill(dest *map[string]any) {
-	files, err := fs.Glob(m.FS, "data/*.yml")
-	if err != nil {
-		return
-	}
-
-	for _, filename := range files {
-		m.scan(dest, filename)
-	}
-}
-
-func (m *Module) scan(dest *map[string]any, filename string) {
-	content, err := fs.ReadFile(m.FS, filename)
-	if err != nil {
-		return
-	}
-
-	_ = yaml.Unmarshal(content, dest)
-}
-
 func (m *Module) renderVuego(ctx context.Context, w http.ResponseWriter, filePath string) error {
-	// Load sidecar data file
-	baseName := strings.TrimSuffix(filePath, filepath.Ext(filePath))
-
-	var data map[string]any
-	for _, ext := range []string{".yaml", ".yml", ".json"} {
-		m.scan(&data, baseName+ext)
-	}
-
-	m.fill(&data)
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	var buf bytes.Buffer
-	if err := m.vuego.Load(filePath).Fill(data).Render(ctx, &buf); err != nil {
+	if err := m.vuego.Load(filePath).Render(ctx, &buf); err != nil {
 		return fmt.Errorf("rendering vuego: %w", err)
 	}
 
@@ -280,7 +246,6 @@ func (m *Module) renderDirListing(ctx context.Context, w http.ResponseWriter, di
 		"entries": items,
 		"path":    dir,
 	}
-	m.fill(&data)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -313,17 +278,8 @@ func (m *Module) readFile(docDir, filePath string) string {
 func (m *Module) renderVuegoFile(ctx context.Context, docDir, filePath string) string {
 	fullPath := path.Join(docDir, filePath)
 
-	// Load sidecar data file, starting with global data
-	baseName := strings.TrimSuffix(fullPath, filepath.Ext(fullPath))
-	var data map[string]any
-	for _, ext := range []string{".yaml", ".yml", ".json"} {
-		dataPath := baseName + ext
-		m.scan(&data, dataPath)
-	}
-	m.fill(&data)
-
 	var buf bytes.Buffer
-	if err := m.vuego.Load(fullPath).Fill(data).Render(ctx, &buf); err != nil {
+	if err := m.vuego.Load(fullPath).Render(ctx, &buf); err != nil {
 		return fmt.Sprintf("<!-- render error: %v -->", err)
 	}
 
