@@ -15,6 +15,7 @@ import (
 	chi "github.com/go-chi/chi/v5"
 	"github.com/titpetric/platform"
 	"github.com/titpetric/vuego"
+	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/vuego-cli/basecoat"
 )
@@ -275,11 +276,36 @@ func (m *Module) readFile(docDir, filePath string) string {
 	return string(content)
 }
 
+func (m *Module) loadDataFile(vuegoPath string) (map[string]any, error) {
+	basePath := strings.TrimSuffix(vuegoPath, ".vuego")
+	data := make(map[string]any)
+
+	for _, ext := range []string{".yml", ".yaml", ".json"} {
+		dataPath := basePath + ext
+		content, err := fs.ReadFile(m.FS, dataPath)
+		if err != nil {
+			continue
+		}
+
+		if err := yaml.Unmarshal(content, &data); err != nil {
+			return nil, fmt.Errorf("parsing %s: %w", dataPath, err)
+		}
+		return data, nil
+	}
+
+	return data, nil
+}
+
 func (m *Module) renderVuegoFile(ctx context.Context, docDir, filePath string) string {
 	fullPath := path.Join(docDir, filePath)
 
+	data, err := m.loadDataFile(fullPath)
+	if err != nil {
+		return fmt.Sprintf("<!-- data error: %v -->", err)
+	}
+
 	var buf bytes.Buffer
-	if err := m.vuego.Load(fullPath).Render(ctx, &buf); err != nil {
+	if err := m.vuego.Load(fullPath).Fill(data).Render(ctx, &buf); err != nil {
 		return fmt.Sprintf("<!-- render error: %v -->", err)
 	}
 

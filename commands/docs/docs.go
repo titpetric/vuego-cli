@@ -35,16 +35,15 @@ func New() *cli.Command {
 
 // Serve starts the docs server using the platform.
 func Serve(ctx context.Context, addr string, contentPath string) error {
-	opts := platform.NewOptions()
-	opts.ServerAddr = addr
-
 	log.Printf("Serving docs from: %s", contentPath)
 	contentFS := os.DirFS(contentPath)
+
+	opts := platform.NewOptions()
 	opts.ThemeFS = contentFS
-	docsModule := NewModule(contentFS)
+	opts.ServerAddr = addr
 
 	p := platform.New(opts)
-	p.Register(docsModule)
+	p.Register(NewModule(contentFS))
 
 	if err := p.Start(context.Background()); err != nil {
 		return err
