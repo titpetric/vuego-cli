@@ -10,6 +10,7 @@ jobs:
   default:
     desc: "Format, lint and test"
     steps:
+      - task: generate
       - task: fmt
       - task: lint
       - task: test
