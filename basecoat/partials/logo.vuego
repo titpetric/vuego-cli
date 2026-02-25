@@ -11,7 +11,6 @@
       <i :data-lucide="theme.header.icon" class="size-4"></i>
     </div>
   </slot>
-
   <div class="grid flex-1 text-left text-sm leading-tight">
     <span class="truncate font-medium">{{ theme.header.title | default("Basecoat") }}</span>
     <span class="truncate text-xs text-muted-foreground">{{ theme.header.subtitle | default("Documentation") }}</span>

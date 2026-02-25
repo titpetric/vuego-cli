@@ -2,24 +2,18 @@
 <html lang="en">
   <head>
     <template include="partials/theme.vuego"></template>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta v-if="description" name="description" v-bind:content="description">
-
     <title v-if="title">{{ title }}</title>
     <title v-else>Documentation</title>
-
     <link rel="stylesheet" href="/assets/css/styles.css">
-
     <template include="partials/basecoat.vuego"></template>
     <template include="partials/hljs.vuego"></template>
-
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   </head>
   <body>
     <template v-html="content"></template>
-
     <template include="partials/footer.vuego"></template>
   </body>
 </html>

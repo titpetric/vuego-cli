@@ -1,25 +1,18 @@
 <template :require="menu">
   <aside id="sidebar" class="sidebar" data-side="left" aria-hidden="false">
     <nav aria-label="Sidebar navigation">
-
       <slot name="header">
         <header>
           <template include="partials/logo.vuego"></template>
         </header>
       </slot>
-
       <section class="scrollbar">
         <template v-for="group in menu">
           <div role="group">
             <h3>{{ group.label }}</h3>
-
             <ul>
               <li v-for="item in group.items">
-                <a :href="item.url">
-                  <i v-if="item.icon" :data-lucide="{{item.icon}}"></i>
-
-                  <span>{{ item.label }}</span>
-                </a>
+                <a :href="item.url"><i v-if="item.icon" :data-lucide="{{item.icon}}"></i> <span>{{ item.label }}</span></a>
               </li>
             </ul>
           </div>

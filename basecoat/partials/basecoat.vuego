@@ -1,8 +1,8 @@
-  <script src="/assets/js/basecoat.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/command.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/dropdown-menu.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/popover.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/select.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/sidebar.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/tabs.js?v={{ pkg.version }}" defer></script>
-  <script src="/assets/js/toast.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/basecoat.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/command.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/dropdown-menu.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/popover.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/select.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/sidebar.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/tabs.js?v={{ pkg.version }}" defer></script>
+<script src="/assets/js/toast.js?v={{ pkg.version }}" defer></script>

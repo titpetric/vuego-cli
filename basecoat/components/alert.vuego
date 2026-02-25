@@ -1,9 +1,7 @@
 <template :required="alert">
   <div role="alert" :class="alert.class != nil ? alert.class : 'alert'">
     <i v-if="alert.icon" :data-lucide="{{ alert.icon }}"></i>
-
     <h2>{{ alert.title }}</h2>
-
     <section v-if="alert.description">{{ alert.description }}</section>
   </div>
 </template>

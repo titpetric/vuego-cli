@@ -1,14 +1,12 @@
 ---
 layout: default
 ---
-
 <template #header>
   <div class="flex flex-col gap-2">
     <h1 class="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">Custom Header Slot</h1>
     <p class="sm:text-lg text-muted-foreground">This header is overridden via a named slot</p>
   </div>
 </template>
-
 <div class="max-w-screen-lg mx-auto">
   <section class="grid grid-cols-1 gap-4 mt-8">
     <div class="card">

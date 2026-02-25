@@ -1,7 +1,6 @@
 ---
 layout: default
 ---
-
 <main class="mx-auto relative flex w-full max-w-screen-lg gap-10">
   <div class="mx-auto w-full flex-1 max-w-screen-md">
     <header class="space-y-2">
@@ -10,7 +9,7 @@ layout: default
     </header>
     <article class="pb-12 mt-8 content" v-html="content"></article>
   </div>
-    <div class="hidden text-sm xl:block w-full max-w-[300px]" v-if="toc">
-       <template include="partials/toc.vuego"></template>
-    </div>
+  <div class="hidden text-sm xl:block w-full max-w-[300px]" v-if="toc">
+    <template include="partials/toc.vuego"></template>
+  </div>
 </main>
