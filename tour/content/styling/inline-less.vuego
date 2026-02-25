@@ -1,7 +1,7 @@
 <html>
-<head>
-<title>Inline LESS Styles</title>
-<style type="text/css+less">
+  <head>
+    <title>Inline LESS Styles</title>
+    <style type="text/css+less">
 @primary: #2c3e50;
 @accent: #e74c3c;
 @light: #ecf0f1;
@@ -67,19 +67,17 @@ h1 {
      background-color: darken(@accent, 10%);
    }
  }
-</style>
-</head>
-<body>
-<div class="container">
-<h1>Inline LESS Styles</h1>
-
-<div class="info-box">
-<p><strong>LESS preprocessor</strong> is automatically compiled to CSS. You can use variables, nesting, operations, and more.</p>
-</div>
-
-<div class="info-box">
-<p>This page demonstrates styling inline with LESS. Variables like <code>@primary</code> and <code>@accent</code> are defined and reused throughout.</p>
-</div>
-</div>
-</body>
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Inline LESS Styles</h1>
+      <div class="info-box">
+        <p><strong>LESS preprocessor</strong> is automatically compiled to CSS. You can use variables, nesting, operations, and more.</p>
+      </div>
+      <div class="info-box">
+        <p>This page demonstrates styling inline with LESS. Variables like <code>@primary</code> and <code>@accent</code> are defined and reused throughout.</p>
+      </div>
+    </div>
+  </body>
 </html>

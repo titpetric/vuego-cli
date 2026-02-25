@@ -22,7 +22,7 @@ layout: default
         <section>
           <ul class="grid gap-4">
             <li v-for="(idx, member) in teamMembers" class="flex items-center gap-4">
-              <img v-bind:src="member.avatar" v-bind:alt="member.name" class="w-10 h-10 rounded-full" />
+              <img v-bind:src="member.avatar" v-bind:alt="member.name" class="w-10 h-10 rounded-full">
               <div class="flex flex-col gap-1 mr-auto">
                 <h3 class="text-sm font-medium leading-none">{{ member.name }}</h3>
                 <p class="text-sm text-muted-foreground">{{ member.email }}</p>
@@ -61,11 +61,8 @@ layout: default
           <form class="form grid gap-6">
             <ul class="flex gap-4">
               <li class="flex-1">
-                <input type="radio" name="payment-method-type" id="payment-method-type-apple" class="hidden peer" />
-                <label for="payment-method-type-apple" class="text-sm font-medium leading-none flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:bg-muted peer-checked:border-primary [&>i]:mb-3 [&>i]:size-6">
-                  <i data-lucide="credit-card"></i>
-                  Card
-                </label>
+                <input type="radio" name="payment-method-type" id="payment-method-type-apple" class="hidden peer">
+                <label for="payment-method-type-apple" class="text-sm font-medium leading-none flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:bg-muted peer-checked:border-primary [&>i]:mb-3 [&>i]:size-6"><i data-lucide="credit-card"></i> Card</label>
               </li>
             </ul>
             <div class="grid gap-2">
@@ -95,7 +92,7 @@ layout: default
               </div>
               <div class="grid gap-2 flex-1">
                 <label for="payment-method-cvv">CVV</label>
-                <input type="text" id="payment-method-cvv" placeholder="123" maxlength="4" class="w-full" />
+                <input type="text" id="payment-method-cvv" placeholder="123" maxlength="4" class="w-full">
               </div>
             </div>
             <button type="button" class="btn w-full">Continue</button>
@@ -113,9 +110,7 @@ layout: default
                 <h3 class="text-sm font-medium leading-none">{{ chat.name }}</h3>
                 <p class="text-sm text-muted-foreground">{{ chat.email }}</p>
               </div>
-              <button type="button" class="btn-icon-outline rounded-full" data-tooltip="New message">
-                <i data-lucide="plus"></i>
-              </button>
+              <button type="button" class="btn-icon-outline rounded-full" data-tooltip="New message"><i data-lucide="plus"></i></button>
             </header>
             <section class="space-y-4">
               <div v-for="(idx, message) in chatMessages">
@@ -183,7 +178,7 @@ layout: default
             </div>
             <div class="grid gap-2">
               <label for="report-issue-subject">Subject</label>
-              <input type="text" id="report-issue-subject" placeholder="I need help with..." class="w-full" />
+              <input type="text" id="report-issue-subject" placeholder="I need help with..." class="w-full">
             </div>
             <div class="grid gap-2">
               <label for="report-issue-description">Description</label>

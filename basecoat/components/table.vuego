@@ -14,13 +14,7 @@
       </tbody>
       <tfoot v-if="table.footer">
         <tr>
-          <td
-            v-for="cell in table.footer.cells"
-            :class="cell.class"
-            :colspan="cell.colspan != nil ? cell.colspan : 1"
-          >
-            {{ cell.value }}
-          </td>
+          <td v-for="cell in table.footer.cells" :class="cell.class" :colspan="cell.colspan != nil ? cell.colspan : 1">{{ cell.value }}</td>
         </tr>
       </tfoot>
     </table>

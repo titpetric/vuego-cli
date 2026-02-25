@@ -1,5 +1,4 @@
 <div role="alert" class="alert">
   <i data-lucide="circle-check"></i>
-
   <h2>{{ title }}</h2>
 </div>

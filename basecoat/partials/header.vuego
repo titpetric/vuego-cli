@@ -1,16 +1,5 @@
 <div class="flex h-14 w-full items-center gap-2 px-4">
-  <button
-    v-if="sidebar"
-    type="button"
-    onclick="document.dispatchEvent(new CustomEvent('basecoat:sidebar'))"
-    aria-label="Toggle sidebar"
-    data-tooltip="Toggle sidebar"
-    data-side="bottom"
-    data-align="start"
-    class="btn-sm-icon-ghost mr-auto size-7 -ml-1.5"
-  >
-    <i data-lucide="panel-left"></i>
-  </button>
+  <button v-if="sidebar" type="button" onclick="document.dispatchEvent(new CustomEvent('basecoat:sidebar'))" aria-label="Toggle sidebar" data-tooltip="Toggle sidebar" data-side="bottom" data-align="start" class="btn-sm-icon-ghost mr-auto size-7 -ml-1.5"><i data-lucide="panel-left"></i></button>
   <div v-if="!sidebar" class="mr-auto">
     <template include="partials/logo.vuego"></template>
   </div>
@@ -39,27 +28,6 @@
       });
     })();
   </script>
-  <button
-    type="button"
-    aria-label="Toggle dark mode"
-    data-tooltip="Toggle dark mode"
-    data-side="bottom"
-    onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))"
-    class="btn-icon-outline size-8"
-  >
-    <span class="hidden dark:block"><i data-lucide="sun"></i></span>
-    <span class="block dark:hidden"><i data-lucide="moon"></i></span>
-  </button>
-  <a
-    v-if="github"
-    :href="github"
-    class="btn-icon size-8"
-    target="_blank"
-    rel="noopener noreferrer"
-    data-tooltip="GitHub repository"
-    data-side="bottom"
-    data-align="end"
-  >
-    <i data-lucide="github"></i>
-  </a>
+  <button type="button" aria-label="Toggle dark mode" data-tooltip="Toggle dark mode" data-side="bottom" onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))" class="btn-icon-outline size-8"><span class="hidden dark:block"><i data-lucide="sun"></i></span> <span class="block dark:hidden"><i data-lucide="moon"></i></span></button>
+  <a v-if="github" :href="github" class="btn-icon size-8" target="_blank" rel="noopener noreferrer" data-tooltip="GitHub repository" data-side="bottom" data-align="end"><i data-lucide="github"></i></a>
 </div>

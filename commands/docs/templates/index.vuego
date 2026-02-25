@@ -2,21 +2,11 @@
   <header class="mb-8">
     <h1 class="text-3xl font-bold">{{ title }}</h1>
   </header>
-
   <nav>
     <ul class="space-y-2">
       <li v-for="entry in entries">
-        <a v-if="entry.IsDir" v-bind:href="entry.Path" class="flex items-center gap-2 text-primary hover:underline">
-          <span>📁</span>
-
-          <span>{{ entry.Name }}/</span>
-        </a>
-
-        <a v-else v-bind:href="entry.Path" class="flex items-center gap-2 text-foreground hover:text-primary">
-          <span>📄</span>
-
-          <span>{{ entry.Name }}</span>
-        </a>
+        <a v-if="entry.IsDir" v-bind:href="entry.Path" class="flex items-center gap-2 text-primary hover:underline"><span>📁</span> <span>{{ entry.Name }}/</span></a>
+        <a v-else v-bind:href="entry.Path" class="flex items-center gap-2 text-foreground hover:text-primary"><span>📄</span> <span>{{ entry.Name }}</span></a>
       </li>
     </ul>
   </nav>

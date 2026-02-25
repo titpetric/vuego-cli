@@ -1,7 +1,5 @@
 <div role="alert" class="alert-destructive">
   <i data-lucide="circle-alert"></i>
-
   <h2>{{ title }}</h2>
-
   <section v-if="description">{{ description }}</section>
 </div>

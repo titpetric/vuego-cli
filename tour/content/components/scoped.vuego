@@ -1,15 +1,10 @@
 <div>
   <p>Parent passes data to child slot using v-slot:</p>
   <template include="list.vuego" :items="fruits">
-    <template v-slot="{ item, index }">
-      {{ index }}. {{ item }}
-    </template>
+    <template v-slot="{ item, index }">{{ index }}. {{ item }}</template>
   </template>
-  
   <p>Same example using the # shorthand:</p>
   <template include="list.vuego" :items="fruits">
-    <template #default="{ item, index }">
-      {{ index }}. {{ item }}
-    </template>
+    <template #default="{ item, index }">{{ index }}. {{ item }}</template>
   </template>
 </div>

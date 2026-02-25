@@ -1,5 +1,5 @@
 <div>
   <a :href="link.url">{{ link.text }}</a>
-  <br/>
+  <br>
   <img :src="imageUrl" :alt="imageAlt">
 </div>
