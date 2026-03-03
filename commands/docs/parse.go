@@ -1,18 +1,21 @@
 package docs
 
 import (
+	"bytes"
 	"context"
-	"html"
 	"path/filepath"
 	"strings"
 
-	blackfriday "github.com/russross/blackfriday/v2"
 	yaml "gopkg.in/yaml.v3"
 )
 
 // parseDirectives parses @ directives in the markdown body.
 // It processes directives on raw markdown, then renders markdown on non-directive content.
 func (m *Module) parseDirectives(ctx context.Context, body, docDir string) string {
+	if !strings.Contains(body, "@") {
+		return body
+	}
+
 	lines := strings.Split(body, "\n")
 	var result []string
 	var currentTabs *TabGroup
@@ -21,7 +24,9 @@ func (m *Module) parseDirectives(ctx context.Context, body, docDir string) strin
 
 	flushMarkdown := func() {
 		if len(markdownBuffer) > 0 {
-			result = append(result, renderMarkdown(strings.Join(markdownBuffer, "\n")))
+			var buf bytes.Buffer
+			_ = m.markdown.RenderBytes(&buf, []byte(strings.Join(markdownBuffer, "\n")))
+			result = append(result, buf.String())
 			markdownBuffer = nil
 		}
 	}
@@ -196,47 +201,4 @@ func parseFrontmatter(content string) (DocMeta, string, error) {
 
 	err := yaml.Unmarshal([]byte(parts[1]), &meta)
 	return meta, strings.TrimSpace(parts[2]), err
-}
-
-type customRenderer struct {
-	*blackfriday.HTMLRenderer
-}
-
-func (r *customRenderer) RenderNode(w *strings.Builder, node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-	if node.Type == blackfriday.CodeBlock {
-		lang := string(node.CodeBlockData.Info)
-		if lang == "" {
-			lang = "text"
-		}
-		w.WriteString(`<pre class="grid text-sm max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code class="language-`)
-		w.WriteString(lang)
-		w.WriteString(` !bg-muted/40 !p-3.5">`)
-		w.WriteString(html.EscapeString(string(node.Literal)))
-		w.WriteString("</code></pre>\n")
-		return blackfriday.GoToNext
-	}
-	if node.Type == blackfriday.Code {
-		code := string(node.Literal)
-		if strings.HasPrefix(code, "<") {
-			w.WriteString(`<code class="highlight language-html">`)
-		} else {
-			w.WriteString(`<code class="highlight">`)
-		}
-		w.WriteString(html.EscapeString(code))
-		w.WriteString("</code>")
-		return blackfriday.GoToNext
-	}
-	return r.HTMLRenderer.RenderNode(w, node, entering)
-}
-
-func renderMarkdown(in string) string {
-	renderer := &customRenderer{
-		HTMLRenderer: blackfriday.NewHTMLRenderer(blackfriday.HTMLRendererParameters{}),
-	}
-	var buf strings.Builder
-	node := blackfriday.New().Parse([]byte(in))
-	node.Walk(func(n *blackfriday.Node, entering bool) blackfriday.WalkStatus {
-		return renderer.RenderNode(&buf, n, entering)
-	})
-	return buf.String()
 }

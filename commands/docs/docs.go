@@ -39,7 +39,7 @@ func Serve(ctx context.Context, addr string, contentPath string) error {
 	contentFS := os.DirFS(contentPath)
 
 	opts := platform.NewOptions()
-	opts.ThemeFS = contentFS
+	opts.ConfigFS = contentFS
 	opts.ServerAddr = addr
 
 	p := platform.New(opts)

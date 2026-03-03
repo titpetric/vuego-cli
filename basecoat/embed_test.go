@@ -36,5 +36,5 @@ func PrintTree(fsys fs.FS) error {
 }
 
 func TestFS(t *testing.T) {
-	PrintTree(basecoat.FS)
+	PrintTree(basecoat.Templates())
 }

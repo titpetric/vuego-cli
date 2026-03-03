@@ -15,6 +15,7 @@ import (
 	chi "github.com/go-chi/chi/v5"
 	"github.com/titpetric/platform"
 	"github.com/titpetric/vuego"
+	"github.com/titpetric/vuego/markdown"
 	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/vuego-cli/basecoat"
@@ -27,7 +28,8 @@ var embeddedTemplates embed.FS
 type Module struct {
 	platform.UnimplementedModule
 
-	vuego vuego.Template
+	vuego    vuego.Template
+	markdown *markdown.Markdown
 
 	FS        fs.FS
 	indexTmpl string
@@ -62,10 +64,11 @@ func notFound(err error) error {
 
 // NewModule creates a new docs module with a filesystem.
 func NewModule(contentFS fs.FS) *Module {
-	ofs := vuego.NewOverlayFS(contentFS, basecoat.FS)
+	ofs := vuego.NewOverlayFS(contentFS, basecoat.Templates(), markdown.Templates())
 	return &Module{
-		FS:    ofs,
-		vuego: vuego.NewFS(ofs, vuego.WithLessProcessor()),
+		FS:       ofs,
+		vuego:    vuego.NewFS(ofs, vuego.WithLessProcessor()),
+		markdown: markdown.New(ofs),
 	}
 }
 
@@ -159,14 +162,22 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 	// Get directory for relative file lookups
 	docDir := path.Dir(docPath)
 
-	// Build HTML directly to preserve DOCTYPE, html, head, body tags
-	// Start with global data from data/*.yml files, then add doc-specific data
-	data := map[string]any{
-		"title":       meta.Title,
-		"subtitle":    meta.Subtitle,
-		"description": meta.Subtitle,
-		"content":     m.parseDirectives(ctx, body, docDir),
+	// Merge front matter from the markdown package
+	doc, err := m.markdown.Load(docPath)
+	if err != nil {
+		return fmt.Errorf("loading markdown: %w", err)
 	}
+
+	data := make(map[string]any)
+	for k, v := range doc.FrontMatter() {
+		data[k] = v
+	}
+
+	// Override with structured fields
+	data["title"] = meta.Title
+	data["subtitle"] = meta.Subtitle
+	data["description"] = meta.Subtitle
+	data["content"] = m.parseDirectives(ctx, body, docDir)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
