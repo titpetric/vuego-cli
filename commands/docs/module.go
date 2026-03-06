@@ -174,10 +174,8 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	layout, _ := data["layout"].(string)
-	if layout == "" {
-		layout = "page"
-	}
+	//layout, _ := data["layout"].(string)
+	layout := "page"
 	if !strings.Contains(layout, ".vuego") {
 		layout = "layouts/" + layout + ".vuego"
 	}

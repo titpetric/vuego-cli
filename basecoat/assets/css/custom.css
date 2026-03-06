@@ -10,73 +10,89 @@
   @apply visible opacity-100;
 }
 
-.content {
-  > h2 {
+.prose {
+  @apply my-6;
+
+  h1 {
+    @apply mt-12 lg:mt-20 mb-8 scroll-m-22 text-3xl lg:text-4xl font-bold tracking-tight first:mt-0;
+  }
+
+  h2 {
     @apply mt-12 lg:mt-20 mb-6 scroll-m-22 text-2xl font-semibold tracking-tight first:mt-0;
   }
-  > h3 {
+
+  h3 {
     @apply mt-8 mb-6 scroll-m-22 text-xl font-semibold tracking-tight;
   }
-  > h4 {
-    @apply my-6 scroll-m-22 font-semibold tracking-tight;
-  }
-  .prose {
-    @apply my-6;
 
-    a {
-      @apply font-medium underline underline-offset-4;
+  h4 {
+    @apply my-6 scroll-m-22 text-lg font-semibold tracking-tight;
+  }
+
+  h5 {
+    @apply mt-6 mb-4 scroll-m-22 text-base font-semibold tracking-tight;
+  }
+
+  h6 {
+    @apply mt-6 mb-2 scroll-m-22 text-sm font-semibold tracking-tight text-muted-foreground;
+  }
+
+  a {
+    @apply font-medium underline underline-offset-4;
+  }
+  code:not(pre > code) {
+    @apply relative rounded-md bg-muted/50 px-[0.3rem] py-[0.2rem] font-mono text-sm;
+  }
+  blockquote {
+    @apply border-l-4 border-border pl-4;
+  }
+  ol {
+    @apply list-decimal ml-6;
+  }
+  ul {
+    @apply list-disc ml-6;
+  }
+  ol,
+  ul {
+    li {
+      @apply mt-2;
     }
-    code:not(pre > code) {
-      @apply relative rounded-md bg-muted/50 px-[0.3rem] py-[0.2rem] font-mono text-sm;
+  }
+  dl {
+    @apply border-b pb-3 my-6;
+    dt {
+      @apply border-t pt-3 mt-3 first:mt-0;
     }
-    blockquote {
-      @apply border-l-4 border-border pl-4;
-    }
-    ol {
-      @apply list-decimal ml-6;
-    }
-    ul {
-      @apply list-disc ml-6;
-    }
-    ol,
-    ul {
-      li {
-        @apply mt-2;
-      }
+    dd {
+      @apply mt-2 space-y-2;
     }
     dl {
-      @apply border-b pb-3 my-6;
-      dt {
-        @apply border-t pt-3 mt-3 first:mt-0;
-      }
-      dd {
-        @apply mt-2 space-y-2;
-      }
-      dl {
-        @apply mt-4 border-b-0 pb-0 pl-8 my-0;
-      }
-    }
-    b,
-    strong {
-      @apply font-semibold;
-    }
-    > p,
-    > blockquote,
-    > ul,
-    > ol,
-    > dl,
-    > table,
-    > pre,
-    > p {
-      @apply my-6;
-    }
-    > *:first-child {
-      @apply !mt-0;
-    }
-    > *:last-child {
-      @apply !mb-0;
+      @apply mt-4 border-b-0 pb-0 pl-8 my-0;
     }
   }
+  b,
+  strong {
+    @apply font-semibold;
+  }
+  > p,
+  > blockquote,
+  > ul,
+  > ol,
+  > dl,
+  > table,
+  > pre,
+  > p {
+    @apply my-6;
+  }
+  > *:first-child {
+    @apply !mt-0;
+  }
+  > *:last-child {
+    @apply !mb-0;
+  }
+}
+
+.content {
   .step {
     counter-increment: step;
 
@@ -90,3 +106,4 @@
     }
   }
 }
+
