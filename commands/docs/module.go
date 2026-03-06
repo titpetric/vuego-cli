@@ -153,15 +153,6 @@ type DocMeta struct {
 }
 
 func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath string, content string) error {
-	// Parse frontmatter
-	meta, body, err := parseFrontmatter(content)
-	if err != nil {
-		return fmt.Errorf("parsing doc: %w", err)
-	}
-
-	// Get directory for relative file lookups
-	docDir := path.Dir(docPath)
-
 	// Merge front matter from the markdown package
 	doc, err := m.markdown.Load(docPath)
 	if err != nil {
@@ -173,30 +164,27 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 		data[k] = v
 	}
 
-	// Override with structured fields
-	data["title"] = meta.Title
-	data["subtitle"] = meta.Subtitle
-	data["description"] = meta.Subtitle
-	data["content"] = m.parseDirectives(ctx, body, docDir)
+	// want: title, subtitle, description
+
+	var contentBuf strings.Builder
+	if err := doc.Render(&contentBuf); err != nil {
+		return fmt.Errorf("rendering markdown: %w", err)
+	}
+	data["content"] = contentBuf.String() // m.parseDirectives(ctx, body, docDir)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	// compute layout path for the doc
-	layoutName := "page"
-	if meta.Layout != "" {
-		layoutName = meta.Layout
+	layout, _ := data["layout"].(string)
+	if layout == "" {
+		layout = "page"
 	}
-	layout := layoutName
-	if !strings.Contains(layoutName, ".vuego") {
+	if !strings.Contains(layout, ".vuego") {
 		layout = "layouts/" + layout + ".vuego"
 	}
 
-	var buf bytes.Buffer
-	if err := m.vuego.Load(layout).Fill(data).Render(ctx, &buf); err != nil {
+	if err := m.vuego.Load(layout).Fill(data).Render(ctx, w); err != nil {
 		return fmt.Errorf("rendering layout: %w", err)
 	}
-
-	_, _ = w.Write(buf.Bytes())
 	return nil
 }
 

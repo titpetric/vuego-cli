@@ -5,8 +5,6 @@ import (
 	"context"
 	"path/filepath"
 	"strings"
-
-	yaml "gopkg.in/yaml.v3"
 )
 
 // parseDirectives parses @ directives in the markdown body.
@@ -186,19 +184,4 @@ func parseDirectiveParts(s string) []string {
 		}
 	}
 	return parts
-}
-
-func parseFrontmatter(content string) (DocMeta, string, error) {
-	var meta DocMeta
-	if !strings.HasPrefix(content, "---") {
-		return meta, content, nil
-	}
-
-	parts := strings.SplitN(content, "---", 3)
-	if len(parts) < 3 {
-		return meta, content, nil
-	}
-
-	err := yaml.Unmarshal([]byte(parts[1]), &meta)
-	return meta, strings.TrimSpace(parts[2]), err
 }
