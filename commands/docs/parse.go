@@ -1,108 +1,87 @@
 package docs
 
 import (
-	"bytes"
 	"context"
 	"path/filepath"
 	"strings"
+
+	"github.com/titpetric/vuego/markdown"
 )
 
-// parseDirectives parses @ directives in the markdown body.
-// It processes directives on raw markdown, then renders markdown on non-directive content.
-func (m *Module) parseDirectives(ctx context.Context, body, docDir string) string {
-	if !strings.Contains(body, "@") {
-		return body
-	}
-
-	lines := strings.Split(body, "\n")
-	var result []string
-	var currentTabs *TabGroup
-	var markdownBuffer []string
-	inTabsBlock := false
-
-	flushMarkdown := func() {
-		if len(markdownBuffer) > 0 {
-			var buf bytes.Buffer
-			_ = m.markdown.RenderBytes(&buf, []byte(strings.Join(markdownBuffer, "\n")))
-			result = append(result, buf.String())
-			markdownBuffer = nil
-		}
-	}
-
-	for i := 0; i < len(lines); i++ {
-		line := lines[i]
-		trimmed := strings.TrimSpace(line)
-
-		// Handle @tabs directive - starts a tab group
-		if trimmed == "@tabs" {
-			flushMarkdown()
-			inTabsBlock = true
-			currentTabs = &TabGroup{}
-			continue
+// DirectivesHandler returns a handler for paragraphs containing @ directives.
+// It detects lines starting with @ and processes them as directives,
+// maintaining compatibility with the legacy @tabs, @render, @file, @example syntax.
+func (m *Module) DirectivesHandler() markdown.Handler {
+	return func(ctx context.Context, n *markdown.Node) (string, bool) {
+		if !strings.HasPrefix(n.Raw, "@") {
+			return "", false
 		}
 
-		// If in tabs block and we hit a blank line, end the tabs block
-		if inTabsBlock && trimmed == "" {
-			if currentTabs != nil && len(currentTabs.Tabs) > 0 {
+		docDir := DocDir(ctx)
+		lines := strings.Split(n.Raw, "\n")
+
+		var result []string
+		var currentTabs *TabGroup
+		inTabsBlock := false
+
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+
+			// Handle @tabs directive - starts a tab group
+			if trimmed == "@tabs" {
+				inTabsBlock = true
+				currentTabs = &TabGroup{}
+				continue
+			}
+
+			// Handle @render directive
+			if strings.HasPrefix(trimmed, "@render ") {
+				tab := m.parseRenderDirective(ctx, trimmed, docDir)
+				if inTabsBlock && currentTabs != nil {
+					currentTabs.Tabs = append(currentTabs.Tabs, tab)
+				} else {
+					result = append(result, m.renderSingleTab(tab))
+				}
+				continue
+			}
+
+			// Handle @file directive
+			if strings.HasPrefix(trimmed, "@file ") {
+				tab := m.parseFileDirective(trimmed, docDir)
+				if inTabsBlock && currentTabs != nil {
+					currentTabs.Tabs = append(currentTabs.Tabs, tab)
+				} else {
+					result = append(result, m.renderSingleTab(tab))
+				}
+				continue
+			}
+
+			// Handle @example directive
+			if strings.HasPrefix(trimmed, "@example ") {
+				tabs := m.parseExampleDirective(ctx, trimmed, docDir)
+				if inTabsBlock && currentTabs != nil {
+					currentTabs.Tabs = append(currentTabs.Tabs, tabs.Tabs...)
+				} else {
+					result = append(result, m.renderTabGroup(tabs))
+				}
+				continue
+			}
+
+			// Non-directive line inside tabs block ends it
+			if inTabsBlock && currentTabs != nil && len(currentTabs.Tabs) > 0 {
 				result = append(result, m.renderTabGroup(currentTabs))
+				inTabsBlock = false
+				currentTabs = nil
 			}
-			inTabsBlock = false
-			currentTabs = nil
-			markdownBuffer = append(markdownBuffer, line)
-			continue
 		}
 
-		// Handle @render directive
-		if strings.HasPrefix(trimmed, "@render ") {
-			flushMarkdown()
-			tab := m.parseRenderDirective(ctx, trimmed, docDir)
-			if inTabsBlock && currentTabs != nil {
-				currentTabs.Tabs = append(currentTabs.Tabs, tab)
-			} else {
-				result = append(result, m.renderSingleTab(tab))
-			}
-			continue
-		}
-
-		// Handle @file directive
-		if strings.HasPrefix(trimmed, "@file ") {
-			flushMarkdown()
-			tab := m.parseFileDirective(trimmed, docDir)
-			if inTabsBlock && currentTabs != nil {
-				currentTabs.Tabs = append(currentTabs.Tabs, tab)
-			} else {
-				result = append(result, m.renderSingleTab(tab))
-			}
-			continue
-		}
-
-		// Handle @example directive
-		if strings.HasPrefix(trimmed, "@example ") {
-			flushMarkdown()
-			tabs := m.parseExampleDirective(ctx, trimmed, docDir)
-			result = append(result, m.renderTabGroup(tabs))
-			continue
-		}
-
-		// Regular line
-		if inTabsBlock && currentTabs != nil && len(currentTabs.Tabs) > 0 {
-			// Flush tabs before continuing with normal content
+		// Flush any remaining tabs
+		if currentTabs != nil && len(currentTabs.Tabs) > 0 {
 			result = append(result, m.renderTabGroup(currentTabs))
-			inTabsBlock = false
-			currentTabs = nil
 		}
-		markdownBuffer = append(markdownBuffer, line)
+
+		return strings.Join(result, "\n"), true
 	}
-
-	// Flush any remaining markdown
-	flushMarkdown()
-
-	// Flush any remaining tabs
-	if currentTabs != nil && len(currentTabs.Tabs) > 0 {
-		result = append(result, m.renderTabGroup(currentTabs))
-	}
-
-	return strings.Join(result, "\n")
 }
 
 func (m *Module) parseRenderDirective(ctx context.Context, line, docDir string) Tab {

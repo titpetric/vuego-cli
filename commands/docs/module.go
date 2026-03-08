@@ -65,11 +65,19 @@ func notFound(err error) error {
 // NewModule creates a new docs module with a filesystem.
 func NewModule(contentFS fs.FS) *Module {
 	ofs := vuego.NewOverlayFS(contentFS, basecoat.Templates(), markdown.Templates())
-	return &Module{
+	m := &Module{
 		FS:       ofs,
 		vuego:    vuego.NewFS(ofs, vuego.WithLessProcessor()),
 		markdown: markdown.New(ofs),
 	}
+	m.markdown.Register(markdown.NodeCodeBlock, m.TabsHandler())
+	m.markdown.Register(markdown.NodeParagraph, m.DirectivesHandler())
+	return m
+}
+
+// LoadMarkdown loads and parses a markdown file from the module's filesystem.
+func (m *Module) LoadMarkdown(filename string) (*markdown.Document, error) {
+	return m.markdown.Load(filename)
 }
 
 // Name returns the module name.
@@ -110,6 +118,21 @@ func (m *Module) serveDoc(w http.ResponseWriter, r *http.Request) error {
 	urlPath = strings.TrimSuffix(urlPath, "/")
 	if urlPath == "" {
 		urlPath = "."
+	}
+
+	// Serve image assets directly from the content filesystem
+	if isImagePath(urlPath) {
+		resolved := urlPath
+		if _, err := fs.Stat(m.FS, resolved); err != nil {
+			// When visiting /a/b/ the browser resolves relative ./b/img.png
+			// as /a/b/b/img.png. Collapse the duplicated directory segment.
+			resolved = collapseDuplicateSegment(resolved)
+			if _, err := fs.Stat(m.FS, resolved); err != nil {
+				return notFound(err)
+			}
+		}
+		http.ServeFileFS(w, r, m.FS, resolved)
+		return nil
 	}
 
 	// Try .vuego file first (exact match)
@@ -166,11 +189,15 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 
 	// want: title, subtitle, description
 
+	// Add docDir to context for handlers
+	docDir := path.Dir(docPath)
+	ctx = WithDocDir(ctx, docDir)
+
 	var contentBuf strings.Builder
-	if err := doc.Render(&contentBuf); err != nil {
+	if err := doc.RenderContext(ctx, &contentBuf); err != nil {
 		return fmt.Errorf("rendering markdown: %w", err)
 	}
-	data["content"] = contentBuf.String() // m.parseDirectives(ctx, body, docDir)
+	data["content"] = contentBuf.String()
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -262,6 +289,34 @@ func (m *Module) renderDirListing(ctx context.Context, w http.ResponseWriter, di
 
 	_, _ = buf.WriteTo(w)
 	return nil
+}
+
+// ServeDocHandler returns an http.HandlerFunc that serves docs (for testing).
+func ServeDocHandler(m *Module) http.HandlerFunc {
+	return handler(m.serveDoc)
+}
+
+// isImagePath returns true if the path has a supported image extension.
+func isImagePath(urlPath string) bool {
+	switch strings.ToLower(path.Ext(urlPath)) {
+	case ".png", ".jpg", ".gif", ".svg":
+		return true
+	}
+	return false
+}
+
+// collapseDuplicateSegment removes a consecutive duplicate directory segment.
+// For example, "a/b/b/file.png" becomes "a/b/file.png".
+// This handles the trailing-slash case where the browser resolves a relative
+// path like ./b/file.png against /a/b/ producing /a/b/b/file.png.
+func collapseDuplicateSegment(urlPath string) string {
+	parts := strings.Split(urlPath, "/")
+	for i := 1; i < len(parts); i++ {
+		if parts[i] == parts[i-1] {
+			return strings.Join(append(parts[:i], parts[i+1:]...), "/")
+		}
+	}
+	return urlPath
 }
 
 func (m *Module) readFile(docDir, filePath string) string {
