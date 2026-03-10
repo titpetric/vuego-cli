@@ -1,0 +1,1 @@
+<pre class="grid text-sm min-h-[150px] max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code v-text="code" :class="'language-' + mode + ' !bg-muted/40 !p-3.5'"></code></pre>

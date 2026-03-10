@@ -64,7 +64,7 @@ func notFound(err error) error {
 
 // NewModule creates a new docs module with a filesystem.
 func NewModule(contentFS fs.FS) *Module {
-	ofs := vuego.NewOverlayFS(contentFS, basecoat.Templates(), markdown.Templates())
+	ofs := vuego.NewOverlayFS(contentFS, embeddedTemplates, basecoat.Templates(), markdown.Templates())
 	m := &Module{
 		FS:       ofs,
 		vuego:    vuego.NewFS(ofs, vuego.WithLessProcessor()),
