@@ -3,7 +3,7 @@ name: Release Vuego CLI binaries
 
 vars:
   name: $(basename $(realpath -s .))
-  semver: $(git tag | tail -n 1)
+  semver: $(git tag --sort=version:refname | tail -n 1)
   image: titpetric/${{name}}
   build:
     goarch: [amd64]
