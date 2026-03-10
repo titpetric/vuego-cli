@@ -78,8 +78,8 @@ github.com/titpetric/lessgo v0.1.0 h1:TrssCXiQPw3zZ4qIzVg7wytZXQz7ir3mGv6LYDzeVj
 github.com/titpetric/lessgo v0.1.0/go.mod h1:VKjDECI8RxTqRmbBRi4y1rAyldGAHuiZohAHGGkTo6g=
 github.com/titpetric/platform v0.4.1 h1:t0p5J7zUsy1yevViwSZ7d5REErqTY4WIqvZ/q1ajdTk=
 github.com/titpetric/platform v0.4.1/go.mod h1:/k8YO53RBN2Pj1uUFsx0H1/oc7qEOE4v6MV4iIgpGxY=
-github.com/titpetric/vuego v0.8.7 h1:h1zbrYrWPLCNejC6wtNPlrOnKN7srBM3bc1fj5dwl+U=
-github.com/titpetric/vuego v0.8.7/go.mod h1:V61JppjhLoMlNldqpjhleFDMZCzF6WDnpleA6hAJm+k=
+github.com/titpetric/vuego v0.8.8 h1:jGt/RuJ1tzCtf8EZ2KQhfq9cAotRwWXfzdqBBtuh2mY=
+github.com/titpetric/vuego v0.8.8/go.mod h1:V61JppjhLoMlNldqpjhleFDMZCzF6WDnpleA6hAJm+k=
 github.com/yuin/goldmark v1.7.16 h1:n+CJdUxaFMiDUNnWC3dMWCIQJSkxH4uz3ZwQBkAlVNE=
 github.com/yuin/goldmark v1.7.16/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=

@@ -9,7 +9,7 @@ require (
 	github.com/titpetric/cli v0.2.6
 	github.com/titpetric/lessgo v0.1.0
 	github.com/titpetric/platform v0.4.1
-	github.com/titpetric/vuego v0.8.7
+	github.com/titpetric/vuego v0.8.8
 	gopkg.in/yaml.v3 v3.0.1
 )
 
