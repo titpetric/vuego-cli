@@ -55,6 +55,9 @@ pre code.hljs{
     overflow-x:auto;
     padding:1em
 }
+pre code.language-plaintext {
+   line-height: 1.15em;
+}
 code.hljs{
     padding:3px 5px
 }
