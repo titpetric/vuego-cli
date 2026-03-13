@@ -77,19 +77,6 @@ jobs:
       - mv -f /usr/local/bin/${{name}} /usr/local/bin/${{name}}.old
       - mv -f /usr/local/bin/${{name}}.new /usr/local/bin/${{name}}
 
-  release:
-    desc: "Release vuego"
-    steps:
-      - task: install
-      - ./ci/release.yml build
-      - ./ci/release.yml test
-
-  publish:
-    desc: "Publish release"
-    depends_on: release
-    steps:
-      - ./ci/release.yml publish
-
   clean:
     steps:
       - rm bin/vuego* -f
