@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/platform"
 
@@ -23,9 +22,9 @@ func New() *cli.Command {
 	return &cli.Command{
 		Name:  "tour",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
-			flag.StringVar(&addr, "addr", ":8080", "HTTP server address")
-			flag.StringVar(&contentPath, "content", "", "Path to tour content directory (uses embedded if not specified)")
+		Bind: func(fs *cli.FlagSet) {
+			fs.StringVar(&addr, "addr", ":8080", "HTTP server address")
+			fs.StringVar(&contentPath, "content", "", "Path to tour content directory (uses embedded if not specified)")
 		},
 		Run: func(ctx context.Context, args []string) error {
 			dir := ""

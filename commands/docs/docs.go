@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/platform"
 )
@@ -20,7 +19,7 @@ func New() *cli.Command {
 	return &cli.Command{
 		Name:  "docs",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
+		Bind: func(fs *cli.FlagSet) {
 			fs.StringVar(&addr, "addr", ":8080", "HTTP server address")
 		},
 		Run: func(ctx context.Context, args []string) error {

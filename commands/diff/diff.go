@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/vuego/diff"
 )
@@ -21,9 +20,9 @@ func New() *cli.Command {
 	return &cli.Command{
 		Name:  "diff",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
-			flag.StringVar(&outputFormat, "output", "unified", "output format: simple, unified, yaml")
-			flag.StringVar(&outputFormat, "format", "unified", "deprecated: use --output instead")
+		Bind: func(fs *cli.FlagSet) {
+			fs.StringVar(&outputFormat, "output", "unified", "output format: simple, unified, yaml")
+			fs.StringVar(&outputFormat, "format", "unified", "deprecated: use --output instead")
 		},
 		Run: func(ctx context.Context, args []string) error {
 			if len(args) != 2 {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/vuego/formatter"
 )
@@ -18,9 +17,6 @@ func New() *cli.Command {
 	return &cli.Command{
 		Name:  "fmt",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
-			// No flags for format command
-		},
 		Run: func(ctx context.Context, args []string) error {
 			if len(args) == 0 {
 				return fmt.Errorf("fmt: missing file argument")

@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/vuego"
 	yaml "gopkg.in/yaml.v3"
@@ -20,9 +19,6 @@ func New() *cli.Command {
 	return &cli.Command{
 		Name:  "render",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
-			// No flags for render command
-		},
 		Run: func(ctx context.Context, args []string) error {
 			if len(args) < 1 || len(args) > 2 {
 				return fmt.Errorf("render: requires 1 or 2 arguments")

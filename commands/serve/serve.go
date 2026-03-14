@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 	"github.com/titpetric/lessgo"
 	"github.com/titpetric/platform"
@@ -28,8 +27,8 @@ func New() *cli.Command {
 	return &cli.Command{
 		Name:  "serve",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
-			flag.StringVar(&addr, "addr", ":8080", "HTTP server address")
+		Bind: func(fs *cli.FlagSet) {
+			fs.StringVar(&addr, "addr", ":8080", "HTTP server address")
 		},
 		Run: func(ctx context.Context, args []string) error {
 			dir := "."

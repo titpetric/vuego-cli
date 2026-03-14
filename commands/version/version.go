@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 
-	flag "github.com/spf13/pflag"
 	"github.com/titpetric/cli"
 )
 
@@ -27,9 +26,6 @@ func NewWithInfo(info Info) *cli.Command {
 	return &cli.Command{
 		Name:  "version",
 		Title: Name,
-		Bind: func(fs *flag.FlagSet) {
-			// No flags for version command
-		},
 		Run: func(ctx context.Context, args []string) error {
 			return Run(info)
 		},
