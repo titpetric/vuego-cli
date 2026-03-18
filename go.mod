@@ -7,7 +7,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/titpetric/cli v0.4.2
 	github.com/titpetric/lessgo v0.1.0
-	github.com/titpetric/platform v0.4.2
+	github.com/titpetric/platform v0.4.4
 	github.com/titpetric/vuego v0.9.1
 	gopkg.in/yaml.v3 v3.0.1
 )
