@@ -5,10 +5,10 @@ go 1.25.5
 require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/stretchr/testify v1.11.1
-	github.com/titpetric/cli v0.4.2
-	github.com/titpetric/lessgo v0.1.0
-	github.com/titpetric/platform v0.4.4
-	github.com/titpetric/vuego v0.9.1
+	github.com/titpetric/cli v0.4.3
+	github.com/titpetric/lessgo v0.1.1
+	github.com/titpetric/platform v0.4.5
+	github.com/titpetric/vuego v0.9.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 
