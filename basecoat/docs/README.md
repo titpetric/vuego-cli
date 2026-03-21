@@ -7,7 +7,7 @@ This is a documentation project which is essentially a setup of:
 - Lucide Icons (CDN)
 - Template driven JS embeddings (highlightjs, htmx, ...)
 
-It provides an usable setup for documentation based pages.
+It provides a usable setup for documentation-based pages.
 To run it, use `vuego-cli docs bootstrap`.
 
 The goals are:
@@ -73,15 +73,18 @@ basecoat/
 
 The theme uses a layout chaining system where templates inherit from parent layouts:
 
-```
-base.vuego              ← Root HTML document (<!DOCTYPE html>)
-    ↓
-├── default.vuego       ← Site wrapper with sidebar and header
-│       ↓
-│   ├── page.vuego      ← Content page with title, description, TOC
-│   └── docs.vuego      ← Documentation page with sidebar navigation
-│
-└── content.vuego       ← Centered content with header only (no sidebar)
+```mermaid
+graph TD
+    base["base.vuego<br/>(root HTML document)"]
+    default["default.vuego<br/>(site wrapper with sidebar and header)"]
+    page["page.vuego<br/>(content page with title, description, TOC)"]
+    docs["docs.vuego<br/>(documentation page with sidebar navigation)"]
+    content["content.vuego<br/>(centered content with header only)"]
+
+    base --> default
+    base --> content
+    default --> page
+    default --> docs
 ```
 
 ### Overridable Templates
@@ -92,11 +95,11 @@ You can override any of the following templates by creating a file with the same
 |----------|---------|--------------|
 | `layouts/base.vuego` | HTML document shell with `<head>` and scripts | `title`, `description` |
 | `layouts/default.vuego` | Site wrapper with sidebar and header | `menu`, `header` |
-| `layouts/content.vuego` | Centered content with header (no sidebar) | — |
+| `layouts/content.vuego` | Centered content with header (no sidebar) | - |
 | `layouts/page.vuego` | Content page layout | `title`, `description`, `toc` |
 | `layouts/docs.vuego` | Documentation page with sidebar | `title`, `subtitle`, `sidebar`, `content` |
-| `partials/header.vuego` | Page header with theme/dark mode toggles | — |
-| `partials/footer.vuego` | Footer scripts (Lucide icons) | — |
+| `partials/header.vuego` | Page header with theme/dark mode toggles | - |
+| `partials/footer.vuego` | Footer scripts (Lucide icons) | - |
 | `partials/sidebar.vuego` | Navigation sidebar | `menu`, `header` |
 | `partials/toc.vuego` | Table of contents | `toc` (array of `{id, label}`) |
 
@@ -235,9 +238,9 @@ If not provided, the GitHub button is hidden from the header.
 
 The theme includes multiple color variants in `assets/css/themes/`:
 
-- **Default** - Standard Basecoat styling
-- **Claude** - Claude-inspired color scheme
-- **Doom 64** - Dark gaming aesthetic
-- **Supabase** - Supabase-inspired colors
+- Default - Standard Basecoat styling
+- Claude - Claude-inspired color scheme
+- Doom 64 - Dark gaming aesthetic
+- Supabase - Supabase-inspired colors
 
 Users can switch themes via the dropdown in the header, with persistence via localStorage.
