@@ -1,4 +1,4 @@
-# vuego-cli
+# vuego-cli - CLI for the vuego template engine
 
 Command-line interface for the vuego template engine. Vuego is a lightweight, expression-based templating system for generating content from templates and data files.
 
