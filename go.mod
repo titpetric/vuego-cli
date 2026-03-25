@@ -6,7 +6,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/stretchr/testify v1.11.1
 	github.com/titpetric/cli v0.4.3
-	github.com/titpetric/lessgo v0.1.1
+	github.com/titpetric/lessgo v0.1.3
 	github.com/titpetric/platform v0.4.5
 	github.com/titpetric/vuego v0.9.2
 	gopkg.in/yaml.v3 v3.0.1
@@ -28,7 +28,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/riandyrn/otelchi v0.12.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	github.com/yuin/goldmark v1.7.17 // indirect
+	github.com/yuin/goldmark v1.8.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.42.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.42.0 // indirect
