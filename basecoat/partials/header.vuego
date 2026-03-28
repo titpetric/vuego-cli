@@ -29,5 +29,5 @@
     })();
   </script>
   <button type="button" aria-label="Toggle dark mode" data-tooltip="Toggle dark mode" data-side="bottom" onclick="document.dispatchEvent(new CustomEvent('basecoat:theme'))" class="btn-icon-outline size-8"><span class="hidden dark:block"><i data-lucide="sun"></i></span> <span class="block dark:hidden"><i data-lucide="moon"></i></span></button>
-  <a v-if="square-code" :href="github" class="btn-icon size-8" target="_blank" rel="noopener noreferrer" data-tooltip="GitHub repository" data-side="bottom" data-align="end"><i data-lucide="github"></i></a>
+  <a v-if="github" :href="github" class="btn-icon size-8" target="_blank" rel="noopener noreferrer" data-tooltip="GitHub repository" data-side="bottom" data-align="end"><i data-lucide="square-code"></i></a>
 </div>
