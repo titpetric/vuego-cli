@@ -19,10 +19,21 @@ import (
 	yaml "gopkg.in/yaml.v3"
 
 	"github.com/titpetric/vuego-cli/basecoat"
+	"github.com/titpetric/vuego-cli/internal/codeblock"
 )
 
 //go:embed templates
 var embeddedTemplates embed.FS
+
+// DefaultConfig selects which code block evaluators the docs server exposes.
+// Shell execution is opt-in: enable EnableExec only on trusted deployments,
+// since it runs arbitrary commands on the host.
+var DefaultConfig = codeblock.Config{
+	EnablePHP:    true,
+	EnableVuego:  true,
+	EnableSQLite: true,
+	EnableExec:   false,
+}
 
 // Module represents the docs module for the platform.
 type Module struct {
@@ -30,6 +41,7 @@ type Module struct {
 
 	vuego    vuego.Template
 	markdown *markdown.Markdown
+	eval     *codeblock.Service
 
 	FS        fs.FS
 	indexTmpl string
@@ -64,13 +76,15 @@ func notFound(err error) error {
 
 // NewModule creates a new docs module with a filesystem.
 func NewModule(contentFS fs.FS) *Module {
-	ofs := vuego.NewOverlayFS(contentFS, embeddedTemplates, basecoat.Templates(), markdown.Templates())
+	ofs := vuego.NewOverlayFS(contentFS, embeddedTemplates, basecoat.Templates(), markdown.Templates(), codeblock.Assets())
 	m := &Module{
 		FS:       ofs,
 		vuego:    vuego.NewFS(ofs, vuego.WithLessProcessor()),
 		markdown: markdown.New(ofs),
+		eval:     codeblock.New(DefaultConfig, ofs, vuego.WithLessProcessor()),
 	}
 	m.markdown.Register(markdown.NodeCodeBlock, m.TabsHandler())
+	m.markdown.Register(markdown.NodeCodeBlock, m.eval.CodeBlockHandler())
 	m.markdown.Register(markdown.NodeParagraph, m.DirectivesHandler())
 	return m
 }
@@ -95,10 +109,22 @@ func (m *Module) Mount(_ context.Context, r platform.Router) error {
 	m.indexTmpl = string(indexData)
 
 	r.Get("/", handler(m.serveIndex))
+	r.Post(codeblock.EvalPath, m.eval.Handler())
 	r.Get("/assets/*", http.FileServer(http.FS(m.FS)).ServeHTTP)
 	r.Get("/*", handler(m.serveDoc))
 
 	return nil
+}
+
+// injectCodeblockScript appends the codeblock runner script to a rendered page
+// so that "Run" buttons become interactive. The script is inserted before the
+// closing </body> tag, falling back to appending it.
+func injectCodeblockScript(page string) string {
+	tag := `<script src="` + codeblock.ScriptPath + `" defer></script>`
+	if strings.Contains(page, "</body>") {
+		return strings.Replace(page, "</body>", tag+"\n</body>", 1)
+	}
+	return page + tag
 }
 
 func (m *Module) serveIndex(w http.ResponseWriter, r *http.Request) error {
@@ -207,9 +233,11 @@ func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath s
 		layout = "layouts/" + layout + ".vuego"
 	}
 
-	if err := m.vuego.Load(layout).Fill(data).Render(ctx, w); err != nil {
+	var page bytes.Buffer
+	if err := m.vuego.Load(layout).Fill(data).Render(ctx, &page); err != nil {
 		return fmt.Errorf("rendering layout: %w", err)
 	}
+	_, _ = w.Write([]byte(injectCodeblockScript(page.String())))
 	return nil
 }
 
