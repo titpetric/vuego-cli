@@ -64,6 +64,68 @@ More content.
 	require.Equal(t, "More content.", lesson2.Content)
 }
 
+func TestParseTour_RunnablePHPFence(t *testing.T) {
+	fs := fstest.MapFS{
+		"01-php.md": &fstest.MapFile{Data: []byte(`# PHP
+
+## Echo
+
+This block is runnable:
+
+` + "```php" + `
+<?php echo "Hello from fence";
+` + "```" + `
+`)},
+	}
+
+	parsed, err := tour.ParseTour(fs)
+	require.NoError(t, err)
+
+	lesson := parsed.Chapters[0].Lessons[0]
+	require.Equal(t, `<?php echo "Hello from fence";`, lesson.Files["index.php"])
+	require.Contains(t, lesson.Content, "Runnable as `index.php`")
+}
+
+func TestParseTour_SQLRefLoadsCompanionMigration(t *testing.T) {
+	fs := fstest.MapFS{
+		"01-sql.md": &fstest.MapFile{Data: []byte(`# SQL
+
+## Query
+
+@file: query.sql
+`)},
+		"sql/query.sql":    &fstest.MapFile{Data: []byte(`SELECT name FROM user_account;`)},
+		"sql/query.up.sql": &fstest.MapFile{Data: []byte(`CREATE TABLE user_account (name TEXT);`)},
+	}
+
+	parsed, err := tour.ParseTour(fs)
+	require.NoError(t, err)
+
+	lesson := parsed.Chapters[0].Lessons[0]
+	require.Equal(t, `SELECT name FROM user_account;`, lesson.Files["query.sql"])
+	require.Equal(t, `CREATE TABLE user_account (name TEXT);`, lesson.Files["query.up.sql"])
+}
+
+func TestParseTour_FileRefOptions(t *testing.T) {
+	fs := fstest.MapFS{
+		"01-sql.md": &fstest.MapFile{Data: []byte(`# SQL
+
+## Query
+
+@file: schema.up.sql hidden
+@file: query.sql
+`)},
+		"sql/schema.up.sql": &fstest.MapFile{Data: []byte(`CREATE TABLE user_account (name TEXT);`)},
+		"sql/query.sql":     &fstest.MapFile{Data: []byte(`SELECT name FROM user_account;`)},
+	}
+
+	parsed, err := tour.ParseTour(fs)
+	require.NoError(t, err)
+
+	lesson := parsed.Chapters[0].Lessons[0]
+	require.Equal(t, []string{"hidden"}, lesson.FileOptions["schema.up.sql"])
+}
+
 func TestParseTour_MultipleChapters(t *testing.T) {
 	fs := fstest.MapFS{
 		"01-intro.md": &fstest.MapFile{
@@ -593,34 +655,6 @@ Content.
 		require.Equal(t, "<html><slot /></html>", lesson.Files["layout.vuego"])
 		require.Equal(t, "name: test", lesson.Files["index.yml"])
 	})
-}
-
-func TestParseTour_EmbeddedContent(t *testing.T) {
-	// Parse the embedded content directly
-	parsed, err := tour.ParseTour(tour.EmbeddedContentFS())
-	require.NoError(t, err)
-
-	// Validate all lessons have .vuego templates
-	require.NoError(t, tour.ValidateTour(parsed))
-
-	require.Len(t, parsed.Chapters, 5, "expected 5 chapters in embedded content")
-
-	// Verify chapters and lesson counts based on ## headings in content files
-	expectedChapters := []struct {
-		title       string
-		lessonCount int
-	}{
-		{"Variable Interpolation", 4}, // 01-interpolation.md has 4 ## headings (added Expressions & Operators)
-		{"Filters", 4},                // 02-filters.md has 4 ## headings
-		{"Directives", 7},             // 03-directives.md has 7 ## headings (added v-for empty, binding-objects, more-directives)
-		{"Components", 6},             // 04-components.md has 6 ## headings (added component shorthands)
-		{"Styling", 3},                // 05-styling.md has 3 ## headings (inline-less, external-styles, registration form)
-	}
-
-	for i, expected := range expectedChapters {
-		require.Equal(t, expected.title, parsed.Chapters[i].Title, "chapter %d title mismatch", i)
-		require.Len(t, parsed.Chapters[i].Lessons, expected.lessonCount, "chapter %d lesson count mismatch", i)
-	}
 }
 
 func TestParseTour_DelimiterParsing(t *testing.T) {

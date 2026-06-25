@@ -13,12 +13,13 @@ import (
 	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 
+	"github.com/titpetric/vuego-cli/content"
 	"github.com/titpetric/vuego-cli/tour"
 )
 
 func newTestHandler(t *testing.T) http.Handler {
 	t.Helper()
-	module := tour.NewModule()
+	module := tour.NewModule(content.VuegoTour())
 	router := chi.NewRouter()
 	err := module.Mount(context.Background(), router)
 	require.NoError(t, err)
@@ -86,6 +87,47 @@ func TestModule_RenderEndpoint(t *testing.T) {
 	err := json.NewDecoder(rec.Body).Decode(&resp)
 	require.NoError(t, err)
 	require.Contains(t, resp["html"], "Hello World")
+}
+
+func TestModule_RenderEndpoint_PHP(t *testing.T) {
+	handler := newTestHandler(t)
+
+	body := `{"files":{"index.php":"<?php echo 'Hello PHP';"}}`
+	req := httptest.NewRequest(http.MethodPost, "/render", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, "application/json", rec.Header().Get("Content-Type"))
+
+	var resp map[string]string
+	err := json.NewDecoder(rec.Body).Decode(&resp)
+	require.NoError(t, err)
+	require.Empty(t, resp["error"])
+	require.Equal(t, "Hello PHP", resp["html"])
+}
+
+func TestModule_RenderEndpoint_SQL(t *testing.T) {
+	handler := newTestHandler(t)
+
+	body := `{"files":{"index.up.sql":"CREATE TABLE user_account (id INTEGER PRIMARY KEY, name TEXT); INSERT INTO user_account (name) VALUES ('Ada');","index.sql":"SELECT id, name FROM user_account;"}}`
+	req := httptest.NewRequest(http.MethodPost, "/render", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	handler.ServeHTTP(rec, req)
+
+	require.Equal(t, http.StatusOK, rec.Code)
+	require.Equal(t, "application/json", rec.Header().Get("Content-Type"))
+
+	var resp map[string]string
+	err := json.NewDecoder(rec.Body).Decode(&resp)
+	require.NoError(t, err)
+	require.Empty(t, resp["error"])
+	require.Contains(t, resp["html"], "<th>name</th>")
+	require.Contains(t, resp["html"], "<td>Ada</td>")
 }
 
 func TestModule_RenderEndpoint_MethodNotAllowed(t *testing.T) {

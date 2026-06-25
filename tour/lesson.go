@@ -11,25 +11,26 @@ import (
 
 // Lesson represents a single lesson within a chapter.
 type Lesson struct {
-	ID             string            // Unique identifier (chapter/lesson index)
-	Title          string            // Lesson title from ## heading
-	Content        string            // Markdown content for the lesson
-	Files          map[string]string // Template and data files for this lesson
-	FileRefs       []string          // File paths from @file: references
-	Chapter        string            // Parent chapter name
-	ChapterTitle   string            // Parent chapter title (friendly name)
-	ChapterSlug    string            // URL-friendly chapter name (e.g., "interpolation")
-	ChapterIdx     int               // Chapter index (0-based)
-	LessonIdx      int               // Lesson index within chapter (0-based)
-	HasPrev        bool              // Whether there's a previous lesson
-	HasNext        bool              // Whether there's a next lesson
-	PrevID         string            // Previous lesson ID
-	NextID         string            // Next lesson ID
-	PrevSlug       string            // Previous lesson chapter slug
-	PrevLessonIdx  int               // Previous lesson index
-	NextSlug       string            // Next lesson chapter slug
-	NextLessonIdx  int               // Next lesson index
-	TotalInChapter int               // Total lessons in this chapter
+	ID             string              // Unique identifier (chapter/lesson index)
+	Title          string              // Lesson title from ## heading
+	Content        string              // Markdown content for the lesson
+	Files          map[string]string   // Template and data files for this lesson
+	FileRefs       []string            // File paths from @file: references
+	FileOptions    map[string][]string // Optional hints from @file references, keyed by filename
+	Chapter        string              // Parent chapter name
+	ChapterTitle   string              // Parent chapter title (friendly name)
+	ChapterSlug    string              // URL-friendly chapter name (e.g., "interpolation")
+	ChapterIdx     int                 // Chapter index (0-based)
+	LessonIdx      int                 // Lesson index within chapter (0-based)
+	HasPrev        bool                // Whether there's a previous lesson
+	HasNext        bool                // Whether there's a next lesson
+	PrevID         string              // Previous lesson ID
+	NextID         string              // Next lesson ID
+	PrevSlug       string              // Previous lesson chapter slug
+	PrevLessonIdx  int                 // Previous lesson index
+	NextSlug       string              // Next lesson chapter slug
+	NextLessonIdx  int                 // Next lesson index
+	TotalInChapter int                 // Total lessons in this chapter
 }
 
 // Chapter represents a chapter containing multiple lessons.
@@ -129,7 +130,9 @@ func parseChapter(contentFS fs.FS, mdFile string, chapterIdx int) (*Chapter, err
 
 	// Load files for each lesson from @file references
 	for _, lesson := range lessons {
-		lesson.Files = chapter.loadLessonFilesFromRefs(contentFS, lesson.FileRefs)
+		for name, content := range chapter.loadLessonFilesFromRefs(contentFS, lesson.FileRefs) {
+			lesson.Files[name] = content
+		}
 		lesson.TotalInChapter = len(lessons)
 		lesson.ChapterTitle = chapter.Title
 		lesson.ChapterSlug = chapter.Slug()
@@ -196,18 +199,20 @@ func (c *Chapter) parseMarkdownLessons(content string) ([]*Lesson, string) {
 			title = fmt.Sprintf("Lesson %d", lessonIdx+1)
 		}
 
-		// Extract @file: references from content
-		fileRefs, cleanContent := extractFileRefs(lessonContent)
+		// Extract @file: references and runnable fenced code blocks from content
+		fileRefs, fileOptions, cleanContent := extractFileRefs(lessonContent)
+		inlineFiles, cleanContent := extractRunnableCodeBlocks(cleanContent)
 
 		lesson := &Lesson{
-			ID:         fmt.Sprintf("%d/%d", chapterIdx, len(lessons)),
-			Title:      title,
-			Content:    cleanContent,
-			FileRefs:   fileRefs,
-			Chapter:    chapterName,
-			ChapterIdx: chapterIdx,
-			LessonIdx:  len(lessons),
-			Files:      make(map[string]string),
+			ID:          fmt.Sprintf("%d/%d", chapterIdx, len(lessons)),
+			Title:       title,
+			Content:     cleanContent,
+			FileRefs:    fileRefs,
+			FileOptions: fileOptions,
+			Chapter:     chapterName,
+			ChapterIdx:  chapterIdx,
+			LessonIdx:   len(lessons),
+			Files:       inlineFiles,
 		}
 		lessons = append(lessons, lesson)
 	}
@@ -216,25 +221,100 @@ func (c *Chapter) parseMarkdownLessons(content string) ([]*Lesson, string) {
 }
 
 // extractFileRefs extracts @file: references from lesson content.
-// Returns the list of file paths and the content with @file: lines removed.
-func extractFileRefs(content string) ([]string, string) {
+// Returns file paths, optional hints keyed by filename, and content with @file lines removed.
+func extractFileRefs(content string) ([]string, map[string][]string, string) {
 	var refs []string
+	options := make(map[string][]string)
 	var cleanLines []string
 
 	lines := strings.Split(content, "\n")
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmed, "@file:") {
-			filePath := strings.TrimSpace(strings.TrimPrefix(trimmed, "@file:"))
+			fields := strings.Fields(strings.TrimSpace(strings.TrimPrefix(trimmed, "@file:")))
+			filePath := ""
+			if len(fields) > 0 {
+				filePath = fields[0]
+			}
 			if filePath != "" {
 				refs = append(refs, filePath)
+				if len(fields) > 1 {
+					options[path.Base(filePath)] = fields[1:]
+				}
 			}
 		} else {
 			cleanLines = append(cleanLines, line)
 		}
 	}
 
-	return refs, strings.TrimSpace(strings.Join(cleanLines, "\n"))
+	return refs, options, strings.TrimSpace(strings.Join(cleanLines, "\n"))
+}
+
+func extractRunnableCodeBlocks(content string) (map[string]string, string) {
+	files := make(map[string]string)
+	var cleanLines []string
+	lines := strings.Split(content, "\n")
+	counters := map[string]int{}
+
+	for i := 0; i < len(lines); i++ {
+		line := lines[i]
+		trimmed := strings.TrimSpace(line)
+		if !strings.HasPrefix(trimmed, "```") && !strings.HasPrefix(trimmed, "~~~") {
+			cleanLines = append(cleanLines, line)
+			continue
+		}
+
+		fence := trimmed[:3]
+		info := strings.TrimSpace(trimmed[3:])
+		ext := runnableExt(info)
+		if ext == "" {
+			cleanLines = append(cleanLines, line)
+			continue
+		}
+
+		var block []string
+		for i++; i < len(lines); i++ {
+			if strings.HasPrefix(strings.TrimSpace(lines[i]), fence) {
+				break
+			}
+			block = append(block, lines[i])
+		}
+
+		counters[ext]++
+		name := "index" + ext
+		if counters[ext] > 1 || files[name] != "" {
+			name = fmt.Sprintf("snippet-%d%s", counters[ext], ext)
+		}
+		files[name] = strings.Join(block, "\n")
+		cleanLines = append(cleanLines, fmt.Sprintf("```%s", strings.TrimPrefix(ext, ".")))
+		cleanLines = append(cleanLines, block...)
+		cleanLines = append(cleanLines, "```")
+		cleanLines = append(cleanLines, "")
+		cleanLines = append(cleanLines, fmt.Sprintf("_Runnable as `%s`._", name))
+	}
+
+	return files, strings.TrimSpace(strings.Join(cleanLines, "\n"))
+}
+
+func runnableExt(info string) string {
+	fields := strings.Fields(info)
+	if len(fields) == 0 {
+		return ""
+	}
+	switch strings.ToLower(fields[0]) {
+	case "php", "application/x-httpd-php":
+		return ".php"
+	case "vuego", "html+vuego":
+		return ".vuego"
+	case "json":
+		return ".json"
+	case "yaml", "yml":
+		return ".yaml"
+	case "sql", "sqlite", "sqlite3":
+		return ".sql"
+	default:
+		return ""
+	}
 }
 
 // loadLessonFilesFromRefs loads files from @file: references.
@@ -267,19 +347,42 @@ func (c *Chapter) loadLessonFilesFromRefs(contentFS fs.FS, refs []string) map[st
 				}
 			}
 		}
+
+		// Implicitly load companion migration for .sql examples.
+		if strings.HasSuffix(fileName, ".sql") {
+			basePath := strings.TrimSuffix(filePath, ".sql")
+			baseName := strings.TrimSuffix(fileName, ".sql")
+			for _, ext := range []string{".up.sql", ".sqlite3"} {
+				dataPath := basePath + ext
+				dataContent, err := fs.ReadFile(contentFS, dataPath)
+				if err == nil {
+					files[baseName+ext] = string(dataContent)
+					break
+				}
+			}
+		}
 	}
 
 	return files
 }
 
-// ValidateLesson checks that a lesson has at least one .vuego file.
+// ValidateLesson checks that a lesson has at least one runnable file.
 func ValidateLesson(lesson *Lesson) error {
 	for _, ref := range lesson.FileRefs {
-		if strings.HasSuffix(ref, ".vuego") {
+		if isRunnableFile(ref) {
 			return nil
 		}
 	}
-	return fmt.Errorf("lesson %q in chapter %q has no .vuego template file", lesson.Title, lesson.Chapter)
+	for name := range lesson.Files {
+		if isRunnableFile(name) {
+			return nil
+		}
+	}
+	return fmt.Errorf("lesson %q in chapter %q has no runnable file", lesson.Title, lesson.Chapter)
+}
+
+func isRunnableFile(name string) bool {
+	return strings.HasSuffix(name, ".vuego") || strings.HasSuffix(name, ".php") || strings.HasSuffix(name, ".sql")
 }
 
 // PrimaryTemplate returns the main .vuego template filename for the lesson.
