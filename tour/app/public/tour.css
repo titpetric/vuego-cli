@@ -116,3 +116,27 @@ footer.chapter-nav a:hover { background: #e8e8e8; text-decoration: none; }
 .output-content { flex: 1; display: flex; }
 .output-content.collapsed { display: none; }
 .output-content iframe { width: 100%; height: 100%; border: none; background: white; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+.table th,
+.table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: top;
+}
+.table th {
+  background: #f8fafc;
+  color: #111827;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+.table tbody tr:nth-child(even) { background: #f9fafb; }
+.table tbody tr:hover { background: #eef2ff; }
