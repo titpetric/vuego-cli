@@ -2,8 +2,9 @@ package tour
 
 import (
 	"context"
-	"log"
+	"io/fs"
 	"os"
+	"testing/fstest"
 
 	"github.com/titpetric/cli"
 	"github.com/titpetric/platform"
@@ -41,18 +42,15 @@ func Serve(ctx context.Context, addr string, contentPath string) error {
 	opts := platform.NewOptions()
 	opts.ServerAddr = addr
 
-	var tourModule *tour.Module
+	var contentFS fs.FS
 	if contentPath != "" {
-		log.Printf("Serving tour from: %s", contentPath)
-		contentFS := os.DirFS(contentPath)
-		tourModule = tour.NewModuleWithFS(contentFS)
+		contentFS = os.DirFS(contentPath)
 	} else {
-		log.Print("Serving embedded tour")
-		tourModule = tour.NewModule()
+		contentFS = fstest.MapFS{}
 	}
 
 	p := platform.New(opts)
-	p.Register(tourModule)
+	p.Register(tour.NewModule(contentFS))
 
 	if err := p.Start(context.Background()); err != nil {
 		return err
