@@ -3,3 +3,5 @@ theme:
     title: vuego-cli
     subtitle: Component Library
     icon: ""
+
+menu: []
