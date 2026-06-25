@@ -2,10 +2,17 @@ let currentLesson = null;
 let files = {};
 let editors = {};
 
+function makeFileId() {
+  if (window.crypto && crypto.randomUUID) return 'file-' + crypto.randomUUID();
+  return 'file-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 function getEditorMode(filename) {
   if (filename.endsWith('.vuego')) return 'ace/mode/html';
   if (filename.endsWith('.json')) return 'ace/mode/json';
   if (filename.endsWith('.yml') || filename.endsWith('.yaml')) return 'ace/mode/yaml';
+  if (filename.endsWith('.php')) return 'ace/mode/php';
+  if (filename.endsWith('.sql') || filename.endsWith('.sqlite3')) return 'ace/mode/sql';
   return 'ace/mode/text';
 }
 
@@ -81,11 +88,18 @@ function renderEditors() {
   container.innerHTML = '';
   editors = {};
   
-  const fileNames = Object.keys(files);
+  const fileNames = Object.keys(files).sort((a, b) => {
+    if (a.endsWith('.up.sql') && !b.endsWith('.up.sql')) return -1;
+    if (!a.endsWith('.up.sql') && b.endsWith('.up.sql')) return 1;
+    return a.localeCompare(b);
+  });
   
   fileNames.forEach((name, i) => {
+    const options = (currentLesson.FileOptions && currentLesson.FileOptions[name]) || [];
+
     const section = document.createElement('div');
     section.className = 'file-section';
+    section.dataset.filename = name;
     
     const header = document.createElement('div');
     header.className = 'file-header';
@@ -101,15 +115,18 @@ function renderEditors() {
     container.appendChild(section);
     
     editors[name] = createEditor(editorWrapper, name, files[name] || '');
+
+    if (options.includes('hidden')) {
+      editorWrapper.classList.add('collapsed');
+      header.querySelector('.file-toggle').innerHTML = '&rarr;';
+      editors[name].resize();
+    }
   });
 }
 
 function toggleFile(name) {
-  const fileNames = Object.keys(files);
-  const idx = fileNames.indexOf(name);
-  if (idx === -1) return;
-  
-  const section = document.querySelectorAll('.file-section')[idx];
+  const section = document.querySelector('.file-section[data-filename="' + cssEscape(name) + '"]');
+  if (!section) return;
   const editorWrapper = section.querySelector('.file-editor');
   const toggle = section.querySelector('.file-toggle');
   
@@ -123,6 +140,11 @@ function toggleFile(name) {
     editorWrapper.classList.add('collapsed');
     toggle.innerHTML = '&rarr;';
   }
+}
+
+function cssEscape(value) {
+  if (window.CSS && CSS.escape) return CSS.escape(value);
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
 function toggleOutput() {
@@ -155,6 +177,15 @@ async function render() {
       template = content;
     } else if (name.endsWith('.json') || name.endsWith('.yml') || name.endsWith('.yaml')) {
       data = content;
+    }
+  }
+
+  if (!template) {
+    for (const [name, content] of Object.entries(files)) {
+      if (name.endsWith('.php') || name.endsWith('.sql')) {
+        template = '';
+        break;
+      }
     }
   }
 
