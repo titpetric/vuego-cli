@@ -88,10 +88,10 @@ github.com/titpetric/lessgo v0.1.3 h1:ShmODb/R67dfBGNYJvyEJRwP8exCEXC4coEjMdYDDV
 github.com/titpetric/lessgo v0.1.3/go.mod h1:AKjim5vLR5vM5ZImUV8velOmv4UyPMb+kqPjkm9wlJM=
 github.com/titpetric/pdo v0.0.0-20260814130052-5c4c128dfa7c h1:8IDbCbpskKNpNZKOZdLkSbI6JvCvX80sZk9dmfOM2es=
 github.com/titpetric/pdo v0.0.0-20260814130052-5c4c128dfa7c/go.mod h1:5gjK3h3omQAPpnVscZwqF8MBhhI6t18mQS/oHeESNKs=
-github.com/titpetric/phpscript v0.2.3 h1:zFwafZWqlSRFySct0sX7X5JMyoDLtWfUJRMubFIRGIU=
-github.com/titpetric/phpscript v0.2.3/go.mod h1:V4h0ZeZ4fcy7sk26QtJbUC6W7+yuXdLkTuumHK19gPE=
-github.com/titpetric/platform v0.4.10-0.20260814161941-c00ba2e6065d h1:1/gOID0ioibfgrH+PQNOghleAPyI0jWHOIFNdp/8Q84=
-github.com/titpetric/platform v0.4.10-0.20260814161941-c00ba2e6065d/go.mod h1:ImVxZUx03Wmq79n4o7dGsWZL6ycuo1aPAxhqzVtUpdY=
+github.com/titpetric/phpscript v0.2.2 h1:yvFcGiveNPBVlt6Eq3rZg7q5asGWqawj+4JezqQ9LUc=
+github.com/titpetric/phpscript v0.2.2/go.mod h1:GhOwN/v+JtqZjYFhrvHjL5VLjRo4qtEFb9xwfAFo+xw=
+github.com/titpetric/platform v0.4.9 h1:JWT0zi4KhMrwS1yEOrqDRYVKhMhh+vTsNYLb9P5cCyI=
+github.com/titpetric/platform v0.4.9/go.mod h1:ImVxZUx03Wmq79n4o7dGsWZL6ycuo1aPAxhqzVtUpdY=
 github.com/titpetric/vuego v0.9.5 h1:R1jOvoqiK8uMMj5G5YmvXPZc/NP7ivQhp9cbLW2jO4c=
 github.com/titpetric/vuego v0.9.5/go.mod h1:F9jJ1VLfZHQbA8uU03xu1atnsyKfdepQU/js2OtSlkE=
 github.com/yuin/goldmark v1.8.5 h1:r6N5afV5qj/5S4UTch8agZHJ8UxNCMwX7WjkkJam2NA=
