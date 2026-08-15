@@ -9,8 +9,8 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/titpetric/cli v0.5.0
 	github.com/titpetric/lessgo v0.1.3
-	github.com/titpetric/phpscript v0.2.2
-	github.com/titpetric/platform v0.4.9
+	github.com/titpetric/phpscript v0.2.4
+	github.com/titpetric/platform v0.5.0
 	github.com/titpetric/vuego v0.9.5
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.56.0
