@@ -75,8 +75,8 @@ github.com/titpetric/phpscript v0.3.0 h1:YGm2WNHxI8dzmiLhmUpru5ZNPRsqctWxKG5uQGi
 github.com/titpetric/phpscript v0.3.0/go.mod h1:qIYcUxZgJtc32MEdjZ7YG/zvXMfYbQEzLynofd3lUi4=
 github.com/titpetric/platform v0.6.1 h1:oeSdRYUIv/gYjKdluRB6+UukD8t4XnoiHkb5KV0gpWE=
 github.com/titpetric/platform v0.6.1/go.mod h1:KOZlAEHCzTA0SN+ZyPPGeaSKGX9y9hzsXYENTSKvUZc=
-github.com/titpetric/vuego v0.9.6 h1:EflNEtbvTM6WpYjOU4awM+lfXuIQlU4sU+dCTU8PG7Y=
-github.com/titpetric/vuego v0.9.6/go.mod h1:HO8fnihIuJGM3oIbgZctCnoh0wK6tEHL5jQGN/TPtJU=
+github.com/titpetric/vuego v0.10.0 h1:aTJ5Fjv6WsH+grChPeCM5LkeQ3d7So/nrTGcabCMZQs=
+github.com/titpetric/vuego v0.10.0/go.mod h1:UV9pAhUc/vLlnWxcI7VwcscWSK5TtQQoshA+7LxtIjM=
 github.com/yuin/goldmark v1.8.5 h1:r6N5afV5qj/5S4UTch8agZHJ8UxNCMwX7WjkkJam2NA=
 github.com/yuin/goldmark v1.8.5/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 go.yaml.in/yaml/v3 v3.0.5 h1:N6y/pJk8buWs9NY5ERU2HSMfm+IuD/OtfdAnq6kESPw=
