@@ -3,15 +3,15 @@ module github.com/titpetric/vuego-cli
 go 1.27.0
 
 require (
-	github.com/go-bridget/mig v0.4.4
-	github.com/go-chi/chi/v5 v5.3.1
+	github.com/go-bridget/mig v0.5.1
+	github.com/go-chi/chi/v5 v5.3.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/stretchr/testify v1.12.1
-	github.com/titpetric/cli v0.5.0
-	github.com/titpetric/lessgo v0.1.3
-	github.com/titpetric/phpscript v0.3.0
-	github.com/titpetric/platform v0.6.1
-	github.com/titpetric/vuego v0.10.0
+	github.com/titpetric/cli v0.6.0
+	github.com/titpetric/lessgo v0.2.0
+	github.com/titpetric/phpscript v0.3.1
+	github.com/titpetric/platform v0.6.2
+	github.com/titpetric/vuego v0.10.1
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.57.0
 )
@@ -29,7 +29,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	github.com/titpetric/oida v0.1.1 // indirect
+	github.com/titpetric/oida v0.2.0 // indirect
 	github.com/titpetric/pdo v0.2.1 // indirect
 	github.com/yuin/goldmark v1.8.5 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
@@ -37,5 +37,5 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	modernc.org/libc v1.75.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.12.0 // indirect
+	modernc.org/memory v1.12.1 // indirect
 )
