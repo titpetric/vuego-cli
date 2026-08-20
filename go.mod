@@ -3,7 +3,7 @@ module github.com/titpetric/vuego-cli
 go 1.27.0
 
 require (
-	github.com/go-bridget/mig v0.5.1
+	github.com/go-bridget/mig v0.5.2
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/stretchr/testify v1.12.1
