@@ -8,13 +8,14 @@ vars:
 
 jobs:
   default:
-    desc: "Format, lint and test"
+    desc: "Format, lint, test and update the compose setup"
     steps:
       - task: generate
       - task: fmt
       - task: lint
       - task: test
       - task: install
+      - task: up
 
   fmt:
     desc: "Run formatters"
@@ -76,6 +77,27 @@ jobs:
       - cp -f ./bin/${{name}}-linux-$(dpkg --print-architecture) /usr/local/bin/${{name}}.new
       - mv -f /usr/local/bin/${{name}} /usr/local/bin/${{name}}.old
       - mv -f /usr/local/bin/${{name}}.new /usr/local/bin/${{name}}
+
+  image:
+    desc: "Build the docker image"
+    depends_on: build
+    passthru: true
+    steps:
+      - docker build -f docker/Dockerfile -t titpetric/vuego-cli:latest .
+
+  up:
+    desc: "Serve the repository content trees behind caddy"
+    depends_on: image
+    passthru: true
+    steps:
+      - docker compose up -d
+      - docker compose ps
+
+  down:
+    desc: "Stop the content trees"
+    passthru: true
+    steps:
+      - docker compose down
 
   clean:
     steps:

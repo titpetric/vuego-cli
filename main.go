@@ -9,6 +9,7 @@ import (
 	"github.com/titpetric/vuego-cli/commands/diff"
 	"github.com/titpetric/vuego-cli/commands/docs"
 	"github.com/titpetric/vuego-cli/commands/format"
+	"github.com/titpetric/vuego-cli/commands/host"
 	"github.com/titpetric/vuego-cli/commands/render"
 	"github.com/titpetric/vuego-cli/commands/serve"
 	"github.com/titpetric/vuego-cli/commands/tour"
@@ -32,6 +33,7 @@ func run() error {
 	app.AddCommand("serve", serve.Name, serve.New)
 	app.AddCommand("tour", tour.Name, tour.New)
 	app.AddCommand("docs", docs.Name, docs.New)
+	app.AddCommand("host", host.Name, host.New)
 
 	// Version command requires build info
 	app.AddCommand("version", version.Name, func() *cli.Command {

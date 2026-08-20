@@ -67,25 +67,36 @@ func NewModule(dir string) (*Module, error) {
 	}, nil
 }
 
+// NewModuleFS creates a serve module backed by an arbitrary filesystem. Use
+// it when the content does not come from a directory on disk, as when
+// embedding content or in tests.
+func NewModuleFS(contentFS fs.FS) *Module {
+	return &Module{dirFS: contentFS}
+}
+
 // Name returns the module name.
 func (m *Module) Name() string {
 	return "vuego-serve"
 }
 
 // Mount registers the serve routes.
+//
+// The middleware is attached to the route rather than to the router with
+// Use, because a router that already carries routes rejects Use. That is the
+// case whenever this module shares a router, as it does when the platform
+// mounts the telemetry dashboard first or when a virtual host hands over its
+// own router.
 func (m *Module) Mount(_ context.Context, r platform.Router) error {
 	fileServer := http.FileServer(http.FS(m.dirFS))
 
-	r.Use(lessgo.NewMiddleware(m.dirFS, "/"))
-
-	r.Use(func(next http.Handler) http.Handler {
+	vuegoRenderer := func(next http.Handler) http.Handler {
 		return &vuegoMiddleware{
 			vuegoHandler: server.Middleware(m.dirFS, server.WithLoadOption(vuego.WithLessProcessor(), vuego.WithComponents())),
 			next:         next,
 		}
-	})
+	}
 
-	r.Handle("/*", fileServer)
+	r.With(lessgo.NewMiddleware(m.dirFS, "/"), vuegoRenderer).Handle("/*", fileServer)
 
 	return nil
 }

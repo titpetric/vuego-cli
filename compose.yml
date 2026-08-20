@@ -1,0 +1,50 @@
+# One vuego-cli serving every content tree in this repository.
+#
+# The container reads vuego-cli.yml from /app and picks the site by the
+# request host, so a single service backs all of the hostnames below rather
+# than one container per site.
+#
+#   docker compose up -d
+#   open https://docs.localhost
+#
+# Caddy terminates TLS for the .localhost names and proxies to port 8080.
+# The hostnames are listed in one space separated caddy label, which is how
+# caddy-docker-proxy attaches several sites to one upstream. Keep the list in
+# step with the domains in vuego-cli.yml: Caddy only routes what it is told
+# about here, and vuego-cli only answers for what is configured there.
+name: vuego-cli
+
+services:
+  sites:
+    image: titpetric/vuego-cli:latest
+    container_name: vuego-cli-sites
+    networks:
+      - projects-ingress
+    labels:
+      caddy: docs.localhost basecoat.localhost bootstrap.localhost tour.localhost
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.encode: zstd gzip
+    environment:
+      # Names this service in the platform telemetry dashboard at
+      # /debug/oida, which otherwise reports every service as "platform".
+      PLATFORM_TELEMETRY_SERVICE: vuego-cli
+
+      # The dashboard is unauthenticated and answers on every hostname the
+      # container serves, so it is asked for explicitly rather than left to
+      # a default. Drop this line to take it off the router.
+      PLATFORM_TELEMETRY_ENABLED: "true"
+    volumes:
+      # The whole checkout, because vuego-cli.yml names paths inside it.
+      # Read only: the sites are rendered from the tree, never written to.
+      - .:/app:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "--header", "Host: docs.localhost", "http://127.0.0.1:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+networks:
+  projects-ingress:
+    external: true

@@ -1,5 +1,12 @@
 menu:
   - type: group
+    label: Guides
+    items:
+      - label: Creating a tour
+        url: /tour-guide
+        icon: book-open
+        attrs: link_attrs
+  - type: group
     label: Getting started
     items:
       - label: Introduction

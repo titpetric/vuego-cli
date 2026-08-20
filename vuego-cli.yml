@@ -1,0 +1,31 @@
+# Virtual hosts for the content trees in this repository.
+#
+# Paths resolve against the directory holding this file, so the same config
+# works from a checkout and from /app inside the container.
+#
+#   vuego-cli host
+#   curl -H 'Host: docs.localhost' http://127.0.0.1:8080/
+#
+# Under compose the hostnames are served over Caddy as https://name.localhost.
+vhost:
+  # The vuego-cli component library: theme.yml plus data/menu.yml.
+  - domain: docs.localhost
+    path: ./docs
+    mode: docs
+
+  # The basecoat theme itself, browsed through its own templates.
+  - domain: basecoat.localhost
+    path: ./basecoat
+    mode: docs
+
+  # The basecoat setup notes, which sit in a subfolder of the theme rather
+  # than at the top of it. basecoat/docs/README.md calls this tree
+  # "bootstrap", though no folder of that name exists any more.
+  - domain: bootstrap.localhost
+    path: ./basecoat/docs
+    mode: docs
+
+  # The vuego tour: numbered chapter files split into lessons.
+  - domain: tour.localhost
+    path: ./content/vuego-tour
+    mode: tour

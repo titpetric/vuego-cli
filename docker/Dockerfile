@@ -14,4 +14,4 @@ EXPOSE 8080
 
 USER nobody
 ENTRYPOINT ["/usr/local/bin/vuego-cli"]
-CMD ["tour"]
+CMD ["host"]
