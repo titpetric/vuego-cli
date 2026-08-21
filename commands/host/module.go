@@ -66,8 +66,13 @@ func WithResolver(resolver Resolver) Option {
 type Module struct {
 	platform.UnimplementedModule
 
-	sites map[string]*site
-	order []string
+	// sites are the configured virtual hosts in configuration order, one
+	// entry per vhost regardless of how many names it answers for.
+	sites []*site
+
+	// byDomain indexes the sites by host name. A vhost listing several
+	// domains appears once per name, all pointing at the same site.
+	byDomain map[string]*site
 
 	// resolver opens each vhost's content filesystem.
 	resolver Resolver
@@ -83,8 +88,8 @@ type Module struct {
 // is reported before the server starts.
 func NewModule(cfg *config.Config, opts ...Option) (*Module, error) {
 	m := &Module{
-		sites:              make(map[string]*site, len(cfg.VHosts)),
-		order:              make([]string, 0, len(cfg.VHosts)),
+		sites:              make([]*site, 0, len(cfg.VHosts)),
+		byDomain:           make(map[string]*site, len(cfg.VHosts)),
 		resolver:           DirFS,
 		trustForwardedHost: cfg.TrustForwardedHost,
 	}
@@ -103,8 +108,11 @@ func NewModule(cfg *config.Config, opts ...Option) (*Module, error) {
 			return nil, fmt.Errorf("vhost %s: %w", vhost.Domain, err)
 		}
 
-		m.sites[vhost.Domain] = &site{vhost: vhost, module: module}
-		m.order = append(m.order, vhost.Domain)
+		s := &site{vhost: vhost, module: module}
+		m.sites = append(m.sites, s)
+		for _, domain := range vhost.Domains() {
+			m.byDomain[config.NormalizeHost(domain)] = s
+		}
 	}
 
 	return m, nil
@@ -134,16 +142,14 @@ func (m *Module) Name() string {
 // startup: a site silently missing from a running server is worse than a
 // server that refuses to start.
 func (m *Module) Mount(ctx context.Context, r platform.Router) error {
-	for _, domain := range m.order {
-		s := m.sites[domain]
-
+	for _, s := range m.sites {
 		router := chi.NewRouter()
 		if err := s.module.Mount(ctx, router); err != nil {
-			return fmt.Errorf("vhost %s: mounting %s: %w", domain, s.vhost.Mode, err)
+			return fmt.Errorf("vhost %s: mounting %s: %w", s.vhost.Domain, s.vhost.Mode, err)
 		}
 		s.router = router
 
-		log.Printf("vhost %s: serving %s from %s", domain, s.vhost.Mode, s.vhost.Path)
+		log.Printf("vhost %s: serving %s from %s", s.vhost.Domain, s.vhost.Mode, s.vhost.Path)
 	}
 
 	r.Handle("/*", http.HandlerFunc(m.dispatch))
@@ -152,9 +158,9 @@ func (m *Module) Mount(ctx context.Context, r platform.Router) error {
 
 // Start starts every virtual host's module.
 func (m *Module) Start(ctx context.Context) error {
-	for _, domain := range m.order {
-		if err := m.sites[domain].module.Start(ctx); err != nil {
-			return fmt.Errorf("vhost %s: %w", domain, err)
+	for _, s := range m.sites {
+		if err := s.module.Start(ctx); err != nil {
+			return fmt.Errorf("vhost %s: %w", s.vhost.Domain, err)
 		}
 	}
 	return nil
@@ -164,10 +170,10 @@ func (m *Module) Start(ctx context.Context) error {
 // given a chance to stop; the first error is returned.
 func (m *Module) Stop(ctx context.Context) error {
 	var firstErr error
-	for i := len(m.order) - 1; i >= 0; i-- {
-		domain := m.order[i]
-		if err := m.sites[domain].module.Stop(ctx); err != nil && firstErr == nil {
-			firstErr = fmt.Errorf("vhost %s: %w", domain, err)
+	for i := len(m.sites) - 1; i >= 0; i-- {
+		s := m.sites[i]
+		if err := s.module.Stop(ctx); err != nil && firstErr == nil {
+			firstErr = fmt.Errorf("vhost %s: %w", s.vhost.Domain, err)
 		}
 	}
 	return firstErr
@@ -178,7 +184,7 @@ func (m *Module) Stop(ctx context.Context) error {
 func (m *Module) dispatch(w http.ResponseWriter, r *http.Request) {
 	host := config.NormalizeHost(m.requestHost(r))
 
-	s, ok := m.sites[host]
+	s, ok := m.byDomain[host]
 	if !ok {
 		http.Error(w, fmt.Sprintf("no site configured for host %q", host), http.StatusNotFound)
 		return

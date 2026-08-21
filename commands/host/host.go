@@ -25,12 +25,15 @@ that passes the client's Host header through.
 The configuration lists the virtual hosts:
 
   vhost:
-    - domain: docs.example.com
+    - domain: docs.example.com docs.localhost
       path: ./content/docs
       mode: docs
     - domain: tour.example.com
       path: ./content/vuego-tour
       mode: tour
+
+A domain field holding several space separated names serves the same content
+on each of them, which is how one site answers on a public and a local name.
 
 A path is the full content root, so point it at a nested folder when the
 documents do not sit at the top of a checkout. Relative paths resolve

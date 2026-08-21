@@ -138,6 +138,37 @@ func TestModule_RoutesByDomain(t *testing.T) {
 	})
 }
 
+// A vhost naming several domains serves one site on all of them: the
+// content filesystem is opened once and the modules are mounted once.
+func TestModule_MultipleDomains(t *testing.T) {
+	sites := map[string]fs.FS{
+		"/docs":  docsSite("# Docs site"),
+		"/other": docsSite("# Other site"),
+	}
+
+	cfg := &config.Config{
+		VHosts: []config.VHost{
+			{Domain: "docs.example.com docs.localhost", Path: "/docs", Mode: config.ModeDocs},
+			{Domain: "other.example.com", Path: "/other", Mode: config.ModeDocs},
+		},
+	}
+	router := testRouter(t, cfg, sites)
+
+	for _, domain := range []string{"docs.example.com", "docs.localhost", "DOCS.localhost:8080"} {
+		t.Run(domain, func(t *testing.T) {
+			w := get(t, router, domain, "/")
+			assert.Equal(t, http.StatusOK, w.Code)
+			assert.Contains(t, w.Body.String(), "Docs site")
+		})
+	}
+
+	t.Run("other vhost is untouched", func(t *testing.T) {
+		w := get(t, router, "other.example.com", "/")
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Contains(t, w.Body.String(), "Other site")
+	})
+}
+
 func TestModule_ForwardedHost(t *testing.T) {
 	sites := map[string]fs.FS{"/docs": docsSite("# Docs site")}
 	vhosts := []config.VHost{{Domain: "docs.example.com", Path: "/docs", Mode: config.ModeDocs}}

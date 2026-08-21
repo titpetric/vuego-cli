@@ -75,6 +75,7 @@ func TestResolve(t *testing.T) {
 		VHosts: []config.VHost{
 			{Domain: "Docs.Example.COM", Path: "content/docs", Mode: config.ModeDocs},
 			{Domain: "abs.example.com", Path: "/srv/tour", Mode: config.ModeTour},
+			{Domain: "  Docs.Example.com.   docs.localhost:8080 ", Path: "/srv/both", Mode: config.ModeDocs},
 		},
 	}
 	cfg.Resolve("/app")
@@ -82,6 +83,13 @@ func TestResolve(t *testing.T) {
 	assert.Equal(t, "docs.example.com", cfg.VHosts[0].Domain)
 	assert.Equal(t, "/app/content/docs", cfg.VHosts[0].Path)
 	assert.Equal(t, "/srv/tour", cfg.VHosts[1].Path, "absolute paths are left alone")
+	assert.Equal(t, "docs.example.com docs.localhost", cfg.VHosts[2].Domain, "every name in the list is normalized")
+}
+
+func TestVHost_Domains(t *testing.T) {
+	assert.Equal(t, []string{"a.example.com"}, config.VHost{Domain: "a.example.com"}.Domains())
+	assert.Equal(t, []string{"a.example.com", "a.localhost"}, config.VHost{Domain: "a.example.com a.localhost"}.Domains())
+	assert.Empty(t, config.VHost{Domain: "   "}.Domains())
 }
 
 func TestValidate(t *testing.T) {
@@ -107,6 +115,30 @@ func TestValidate(t *testing.T) {
 				{Domain: "a.example.com", Path: "/b", Mode: config.ModeTour},
 			},
 			errmsg: "already declared by vhost[0]",
+		},
+		{
+			name: "duplicate domain in a list",
+			vhosts: []config.VHost{
+				{Domain: "a.example.com b.example.com", Path: "/a", Mode: config.ModeDocs},
+				{Domain: "c.example.com b.example.com", Path: "/b", Mode: config.ModeTour},
+			},
+			errmsg: `domain "b.example.com" already declared by vhost[0]`,
+		},
+		{
+			name: "domain listed twice in one entry",
+			vhosts: []config.VHost{
+				{Domain: "a.example.com a.example.com", Path: "/a", Mode: config.ModeDocs},
+			},
+			errmsg: `domain "a.example.com" is listed twice`,
+		},
+		{
+			name:   "blank domain list",
+			vhosts: []config.VHost{{Domain: "   ", Path: "/site", Mode: config.ModeDocs}},
+			errmsg: "domain is required",
+		},
+		{
+			name:   "several domains",
+			vhosts: []config.VHost{{Domain: "a.example.com a.localhost", Path: "/a", Mode: config.ModeDocs}},
 		},
 		{
 			name:   "missing path",

@@ -6,12 +6,15 @@
 // serve several documentation sites from one folder tree.
 //
 //	vhost:
-//	  - domain: docs.example.com
+//	  - domain: docs.example.com docs.localhost
 //	    path: ./content/docs
 //	    mode: docs
 //	  - domain: tour.example.com
 //	    path: ./content/vuego-tour
 //	    mode: tour
+//
+// A domain field holding several space separated names serves the same
+// content on each of them.
 package config
 
 import (
@@ -63,10 +66,12 @@ func (m Mode) String() string {
 	return string(m)
 }
 
-// VHost binds a domain name to a content folder and a rendering mode.
+// VHost binds one or more domain names to a content folder and a rendering
+// mode.
 type VHost struct {
-	// Domain is the host name matched against the request. Matching is
-	// case insensitive and ignores the port.
+	// Domain is the host name matched against the request, or several of
+	// them separated by spaces, which serves the same content on every
+	// name listed. Matching is case insensitive and ignores the port.
 	Domain string `yaml:"domain"`
 
 	// Path is the folder served for this domain. It is the full content
@@ -77,6 +82,13 @@ type VHost struct {
 
 	// Mode selects the server: docs, tour or serve.
 	Mode Mode `yaml:"mode"`
+}
+
+// Domains returns the host names the vhost answers for, in the order they
+// are written. The domain field holds a space separated list, so one content
+// tree can be served on a public and a local name at once.
+func (v VHost) Domains() []string {
+	return strings.Fields(v.Domain)
 }
 
 // Config is the vuego-cli configuration document.
@@ -176,7 +188,7 @@ func Decode(data []byte) (*Config, error) {
 func (c *Config) Resolve(base string) {
 	for i := range c.VHosts {
 		vhost := &c.VHosts[i]
-		vhost.Domain = NormalizeHost(vhost.Domain)
+		vhost.Domain = normalizeDomains(vhost.Domain)
 		if vhost.Path != "" && !filepath.IsAbs(vhost.Path) {
 			vhost.Path = filepath.Join(base, vhost.Path)
 		}
@@ -197,13 +209,19 @@ func (c *Config) Validate() error {
 
 	seen := make(map[string]int, len(c.VHosts))
 	for i, vhost := range c.VHosts {
-		if vhost.Domain == "" {
+		domains := vhost.Domains()
+		if len(domains) == 0 {
 			return fmt.Errorf("vhost[%d]: domain is required", i)
 		}
-		if first, ok := seen[vhost.Domain]; ok {
-			return fmt.Errorf("vhost[%d]: domain %q already declared by vhost[%d]", i, vhost.Domain, first)
+		for _, domain := range domains {
+			if first, ok := seen[domain]; ok {
+				if first == i {
+					return fmt.Errorf("vhost[%d]: domain %q is listed twice", i, domain)
+				}
+				return fmt.Errorf("vhost[%d]: domain %q already declared by vhost[%d]", i, domain, first)
+			}
+			seen[domain] = i
 		}
-		seen[vhost.Domain] = i
 
 		if vhost.Path == "" {
 			return fmt.Errorf("vhost[%d] (%s): path is required", i, vhost.Domain)
@@ -214,6 +232,19 @@ func (c *Config) Validate() error {
 		}
 	}
 	return nil
+}
+
+// normalizeDomains normalizes every host name in a space separated domain
+// field and renders the list back with single spaces between the names.
+func normalizeDomains(domains string) string {
+	names := strings.Fields(domains)
+	out := names[:0]
+	for _, name := range names {
+		if host := NormalizeHost(name); host != "" {
+			out = append(out, host)
+		}
+	}
+	return strings.Join(out, " ")
 }
 
 // NormalizeHost reduces a host name to the form used for matching: lower

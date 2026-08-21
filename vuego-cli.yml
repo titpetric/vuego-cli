@@ -7,6 +7,10 @@
 #   curl -H 'Host: docs.localhost' http://127.0.0.1:8080/
 #
 # Under compose the hostnames are served over Caddy as https://name.localhost.
+#
+# A domain may list several space separated names, which serves the same
+# content on all of them, e.g. "vuego.incubator.to vuego.localhost". Every
+# name also has to be on the caddy label in compose.yml to be routed there.
 vhost:
   # The vuego-cli component library: theme.yml plus data/menu.yml.
   - domain: docs.localhost

@@ -70,7 +70,7 @@ Sites are declared in `vuego-cli.yml`:
 
 ```yaml
 vhost:
-  - domain: docs.example.com
+  - domain: docs.example.com docs.localhost
     path: ./content/docs
     mode: docs
   - domain: tour.example.com
@@ -83,7 +83,9 @@ vhost:
 
 A vhost entry has three fields:
 
-- `domain`: the host name to match. Matching ignores case and the port.
+- `domain`: the host name to match, or several of them separated by spaces,
+  which serves the same content on every name listed. Matching ignores case
+  and the port. A name may only appear in one vhost entry.
 - `path`: the content root. This is the full path to the folder holding the
   content, so point it at the nested folder when the documents do not sit at
   the top of a checkout. Relative paths resolve against the directory holding
