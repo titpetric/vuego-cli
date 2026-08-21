@@ -10,7 +10,7 @@ jobs:
   default:
     desc: "Format, lint, test and update the compose setup"
     steps:
-      - task: generate
+#      - task: generate
       - task: fmt
       - task: lint
       - task: test
@@ -20,8 +20,8 @@ jobs:
   fmt:
     desc: "Run formatters"
     steps:
-      - goimports -w -local $(go list .) .
-      - goimports-reviser -set-alias -format -imports-order "std,blanked,general,company,project" ./...
+#      - goimports -w -local $(go list .) .
+#      - goimports-reviser -set-alias -format -imports-order "std,blanked,general,company,project" ./...
       - go fmt ./...
       - go mod tidy
 
