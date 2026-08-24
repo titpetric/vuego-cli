@@ -14,6 +14,7 @@ import (
 	"html"
 	"io"
 	"io/fs"
+	"log/slog"
 	"path"
 	"regexp"
 	"sort"
@@ -127,7 +128,10 @@ func migrateSQL(ctx context.Context, db *sqlx.DB, files map[string]string) error
 	if len(fsys.Migrations()) == 0 {
 		return nil
 	}
-	return migrate.RunWithFS(ctx, db, fsys, &migrate.Options{Project: "tour", Apply: true})
+	options := migrate.NewOptions(slog.Default())
+	options.Project = "tour"
+	options.Apply = true
+	return migrate.RunWithFS(ctx, db, fsys, options)
 }
 
 func sortedSQLFiles(files map[string]string) []string {
