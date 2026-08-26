@@ -20,6 +20,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"testing/fstest"
 
 	_ "modernc.org/sqlite"
 
@@ -114,24 +115,37 @@ func render(ctx context.Context, files map[string]string) (string, error) {
 	return "<pre>ok</pre>", nil
 }
 
+// migrateSQL applies the migrations in the file set to db. Both *.up.sql and
+// *.sqlite3 count as migrations; the latter is renamed so mig's default
+// *.up.sql pattern picks it up. Names are flattened to their base, which puts
+// every migration at the root of the in-memory FS handed to mig.
+//
+// A snippet with no migrations at all is normal, and the empty set returns
+// before Apply, which reports ErrNoMigrations for it.
 func migrateSQL(ctx context.Context, db *sqlx.DB, files map[string]string) error {
-	fsys := migrate.NewFS()
+	fsys := fstest.MapFS{}
 	for name, content := range files {
 		if strings.HasSuffix(name, ".up.sql") || strings.HasSuffix(name, ".sqlite3") {
 			migrationName := name
 			if strings.HasSuffix(name, ".sqlite3") {
 				migrationName = strings.TrimSuffix(name, ".sqlite3") + ".up.sql"
 			}
-			fsys[path.Base(migrationName)] = []byte(content)
+			fsys[path.Base(migrationName)] = &fstest.MapFile{Data: []byte(content)}
 		}
 	}
-	if len(fsys.Migrations()) == 0 {
+	if len(fsys) == 0 {
 		return nil
 	}
-	options := migrate.NewOptions(slog.Default())
-	options.Project = "tour"
-	options.Apply = true
-	return migrate.RunWithFS(ctx, db, fsys, options)
+
+	m, err := migrate.NewManager(db, fsys, "tour")
+	if err != nil {
+		return err
+	}
+	applied, err := m.Apply(ctx)
+	for _, item := range applied {
+		slog.Default().Info("migration", "file", item.Filename, "status", item.Status)
+	}
+	return err
 }
 
 func sortedSQLFiles(files map[string]string) []string {
