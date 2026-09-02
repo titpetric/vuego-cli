@@ -48,7 +48,7 @@ jobs:
     desc: "Run linters"
     passthru: true
     steps:
-      - go-fsck lint ./... || true
+      - splint ./... || true
       - go vet ./...
 
   build:
