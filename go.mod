@@ -3,11 +3,11 @@ module github.com/titpetric/vuego-cli
 go 1.27.0
 
 require (
-	github.com/go-bridget/mig v0.6.3
+	github.com/go-bridget/mig v0.6.5
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/stretchr/testify v1.12.1
-	github.com/titpetric/cli v0.6.0
+	github.com/titpetric/cli v0.6.1
 	github.com/titpetric/lessgo v0.2.0
 	github.com/titpetric/phpscript v0.4.1
 	github.com/titpetric/platform v0.7.2
@@ -29,7 +29,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	github.com/titpetric/oida v0.3.0 // indirect
+	github.com/titpetric/oida v0.4.0 // indirect
 	github.com/titpetric/pdo v0.2.5 // indirect
 	github.com/yuin/goldmark v1.8.6 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
