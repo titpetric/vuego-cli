@@ -10,8 +10,8 @@ require (
 	github.com/titpetric/cli v0.6.1
 	github.com/titpetric/lessgo v0.2.0
 	github.com/titpetric/phpscript v0.4.1
-	github.com/titpetric/platform v0.7.2
-	github.com/titpetric/vuego v0.10.1
+	github.com/titpetric/platform v0.7.3
+	github.com/titpetric/vuego v0.10.2
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.58.0
 )
