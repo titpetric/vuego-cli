@@ -9,8 +9,8 @@
 *.prof
 pkg.cov
 pkg.cov.json
-go-fsck.json
 
 # Build artifacts
 /vuego
 /vuego-cli
+splint.json
