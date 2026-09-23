@@ -19,7 +19,7 @@ services:
     image: titpetric/vuego-cli:latest
     container_name: vuego-cli-sites
     networks:
-      - projects-ingress
+      - proxy-ingress
     labels:
       caddy: docs.localhost basecoat.localhost bootstrap.localhost tour.localhost
       caddy.reverse_proxy: "{{upstreams 8080}}"
@@ -46,5 +46,5 @@ services:
     restart: unless-stopped
 
 networks:
-  projects-ingress:
+  proxy-ingress:
     external: true
