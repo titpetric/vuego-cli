@@ -10,7 +10,7 @@ require (
 	github.com/titpetric/cli v0.6.1
 	github.com/titpetric/lessgo v0.2.0
 	github.com/titpetric/phpscript v0.5.0
-	github.com/titpetric/platform v0.7.3
+	github.com/titpetric/platform v0.7.4
 	github.com/titpetric/vuego v0.10.2
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.59.0
@@ -38,7 +38,7 @@ require (
 	golang.org/x/image v0.46.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
-	modernc.org/libc v1.77.0 // indirect
+	modernc.org/libc v1.77.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
