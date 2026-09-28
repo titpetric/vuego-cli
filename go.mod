@@ -7,7 +7,7 @@ require (
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/stretchr/testify v1.12.1
-	github.com/titpetric/cli v0.6.1
+	github.com/titpetric/cli v0.7.0
 	github.com/titpetric/lessgo v0.2.0
 	github.com/titpetric/phpscript v0.5.0
 	github.com/titpetric/platform v0.7.4
