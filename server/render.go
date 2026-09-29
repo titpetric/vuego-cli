@@ -3,63 +3,13 @@ package server
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io/fs"
-	"net/http"
 	"strings"
 	"testing/fstest"
 
 	"github.com/titpetric/vuego"
 	yaml "gopkg.in/yaml.v3"
 )
-
-// RenderRequest contains template and data for rendering.
-type RenderRequest struct {
-	Template string            `json:"template"`
-	Data     string            `json:"data"`
-	Files    map[string]string `json:"files,omitempty"`
-}
-
-// RenderResponse contains the rendered HTML or an error.
-type RenderResponse struct {
-	HTML  string `json:"html,omitempty"`
-	Error string `json:"error,omitempty"`
-}
-
-// RenderHandler returns an http.HandlerFunc that renders templates via POST /render.
-// The optional baseFS provides additional files (like components) available during rendering.
-func RenderHandler(baseFS fs.FS, opts ...vuego.LoadOption) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		if r.Method != http.MethodPost {
-			_ = json.NewEncoder(w).Encode(RenderResponse{
-				Error: "method not allowed",
-			})
-			return
-		}
-
-		var req RenderRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			_ = json.NewEncoder(w).Encode(RenderResponse{
-				Error: "invalid JSON: " + err.Error(),
-			})
-			return
-		}
-
-		html, err := Render(r.Context(), baseFS, req, opts...)
-		if err != nil {
-			_ = json.NewEncoder(w).Encode(RenderResponse{
-				Error: err.Error(),
-			})
-			return
-		}
-
-		_ = json.NewEncoder(w).Encode(RenderResponse{
-			HTML: html,
-		})
-	}
-}
 
 // Render processes a RenderRequest and returns rendered HTML.
 // This function can be used by both HTTP handlers and CLI commands.
@@ -151,50 +101,4 @@ func injectStyleLinksIntoTemplate(files map[string]string, template string) stri
 	}
 
 	return template + styleTags.String()
-}
-
-// injectStyleLinksForRequest injects style links for adjacent .less/.css files in the request files.
-func injectStyleLinksForRequest(buf *bytes.Buffer, files map[string]string) (string, error) {
-	// For API requests, look for style files in the files map
-	var styleFiles []string
-	for name := range files {
-		if strings.HasSuffix(name, ".less") || strings.HasSuffix(name, ".css") {
-			styleFiles = append(styleFiles, name)
-		}
-	}
-
-	if len(styleFiles) == 0 {
-		return buf.String(), nil
-	}
-
-	// Inject style files as <style> tags or <link> tags
-	htmlContent := buf.String()
-	var styleTags strings.Builder
-
-	for _, name := range styleFiles {
-		if content, ok := files[name]; ok {
-			// For LESS files, use type="text/css+less" so the LessProcessor compiles it
-			if strings.HasSuffix(name, ".less") {
-				styleTags.WriteString("\n<style type=\"text/css+less\">")
-				styleTags.WriteString(content)
-				styleTags.WriteString("</style>")
-			} else {
-				// For plain CSS files, use regular style tag
-				styleTags.WriteString("\n<style>")
-				styleTags.WriteString(content)
-				styleTags.WriteString("</style>")
-			}
-		}
-	}
-
-	// Inject before </head> or </body>
-	if strings.Contains(htmlContent, "</head>") {
-		htmlContent = strings.Replace(htmlContent, "</head>", styleTags.String()+"\n</head>", 1)
-	} else if strings.Contains(htmlContent, "</body>") {
-		htmlContent = strings.Replace(htmlContent, "</body>", styleTags.String()+"\n</body>", 1)
-	} else {
-		htmlContent = htmlContent + styleTags.String()
-	}
-
-	return htmlContent, nil
 }

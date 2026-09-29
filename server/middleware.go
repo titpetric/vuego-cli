@@ -13,20 +13,6 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-// MiddlewareOption configures the middleware behavior.
-type MiddlewareOption func(*middlewareConfig)
-
-type middlewareConfig struct {
-	loadOptions []vuego.LoadOption
-}
-
-// WithLoadOption adds a LoadOption to the middleware's Vue instance.
-func WithLoadOption(opt ...vuego.LoadOption) MiddlewareOption {
-	return func(cfg *middlewareConfig) {
-		cfg.loadOptions = append(cfg.loadOptions, opt...)
-	}
-}
-
 // Middleware creates an http.Handler that processes .vuego files from the given filesystem.
 // It renders .vuego files with accompanying .yml or .json data files.
 // Non-.vuego requests are passed through to the next handler or return 404.
