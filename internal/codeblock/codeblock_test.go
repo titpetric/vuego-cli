@@ -177,3 +177,34 @@ func TestHTTPHandler_InvalidJSON(t *testing.T) {
 	require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
 	require.Contains(t, resp.Error, "invalid JSON")
 }
+
+// TestCanonical covers the fence-info aliases: a document writes "sh", "bash"
+// or "shell" and they all mean the same evaluator. The mapping is what lets a
+// lesson be written in the language name its readers expect.
+func TestCanonical(t *testing.T) {
+	tests := map[string]string{
+		"vuego":                   codeblock.LangVuego,
+		"html+vuego":              codeblock.LangVuego,
+		"php":                     codeblock.LangPHP,
+		"application/x-httpd-php": codeblock.LangPHP,
+		"exec":                    codeblock.LangExec,
+		"bash":                    codeblock.LangExec,
+		"sh":                      codeblock.LangExec,
+		"shell":                   codeblock.LangExec,
+		"sql":                     codeblock.LangSQL,
+		"sqlite":                  codeblock.LangSQL,
+		"sqlite3":                 codeblock.LangSQL,
+	}
+
+	for fence, want := range tests {
+		got, ok := codeblock.Canonical(fence)
+		require.True(t, ok, "%q is a known fence language", fence)
+		require.Equal(t, want, got)
+	}
+
+	for _, fence := range []string{"", "go", "PHP", "javascript", "text"} {
+		got, ok := codeblock.Canonical(fence)
+		require.False(t, ok, "%q is not a runnable fence language", fence)
+		require.Equal(t, "", got)
+	}
+}
