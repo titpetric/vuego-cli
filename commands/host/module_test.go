@@ -5,6 +5,8 @@ import (
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"testing/fstest"
 
@@ -276,4 +278,76 @@ func TestCommandCreation(t *testing.T) {
 	cmd := host.New()
 	require.NotNil(t, cmd)
 	assert.Equal(t, "host", cmd.Name)
+}
+
+// TestResolver covers the seam itself: a Resolver is a func from a vhost path
+// to the filesystem serving it, and host.DirFS is the production one. Anything
+// with that signature is usable, which is what lets a test serve from memory.
+func TestResolver(t *testing.T) {
+	var fromDisk host.Resolver = host.DirFS
+	require.NotNil(t, fromDisk)
+
+	_, err := fromDisk(filepath.Join(t.TempDir(), "absent"))
+	require.Error(t, err, "a path that is not there is not a content root")
+
+	dir := t.TempDir()
+	contentFS, err := fromDisk(dir)
+	require.NoError(t, err)
+	require.NotNil(t, contentFS)
+
+	file := filepath.Join(dir, "README.md")
+	require.NoError(t, os.WriteFile(file, []byte("# Hi"), 0o600))
+	_, err = fromDisk(file)
+	require.Error(t, err, "a file is not a directory")
+
+	var fromMemory host.Resolver = func(string) (fs.FS, error) {
+		return fstest.MapFS{"README.md": &fstest.MapFile{Data: []byte("# Hi")}}, nil
+	}
+	got, err := fromMemory("anything")
+	require.NoError(t, err)
+	require.NotNil(t, got)
+}
+
+// TestModule_Start covers the lifecycle hook reaching every vhost's module.
+// The platform calls it once after Mount, and a module that never starts
+// serves nothing.
+func TestModule_Start(t *testing.T) {
+	cfg := &config.Config{
+		VHosts: []config.VHost{
+			{Domain: "docs.localhost", Path: "docs", Mode: "docs"},
+			{Domain: "tour.localhost", Path: "tour", Mode: "tour"},
+		},
+	}
+	sites := map[string]fs.FS{
+		"docs": docsSite("# Docs"),
+		"tour": fstest.MapFS{},
+	}
+
+	module, err := host.NewModule(cfg, host.WithResolver(resolver(sites)))
+	require.NoError(t, err)
+
+	require.NoError(t, module.Start(context.Background()))
+}
+
+// TestModule_Stop covers the other half, which the platform calls on shutdown.
+// Every module is given a chance to stop even if an earlier one failed, so a
+// second call has to stay harmless.
+func TestModule_Stop(t *testing.T) {
+	cfg := &config.Config{
+		VHosts: []config.VHost{
+			{Domain: "docs.localhost", Path: "docs", Mode: "docs"},
+			{Domain: "tour.localhost", Path: "tour", Mode: "tour"},
+		},
+	}
+	sites := map[string]fs.FS{
+		"docs": docsSite("# Docs"),
+		"tour": fstest.MapFS{},
+	}
+
+	module, err := host.NewModule(cfg, host.WithResolver(resolver(sites)))
+	require.NoError(t, err)
+
+	require.NoError(t, module.Start(context.Background()))
+	require.NoError(t, module.Stop(context.Background()))
+	require.NoError(t, module.Stop(context.Background()))
 }

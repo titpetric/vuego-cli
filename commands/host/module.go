@@ -50,16 +50,6 @@ func DirFS(path string) (fs.FS, error) {
 	return os.DirFS(absPath), nil
 }
 
-// Option configures a Module.
-type Option func(*Module)
-
-// WithResolver replaces the filesystem resolver used to open vhost content.
-func WithResolver(resolver Resolver) Option {
-	return func(m *Module) {
-		m.resolver = resolver
-	}
-}
-
 // Module routes requests to a per-domain module. Every virtual host gets its
 // own router, so the modules keep mounting at their absolute paths and stay
 // unaware of each other.
