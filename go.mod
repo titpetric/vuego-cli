@@ -11,9 +11,9 @@ require (
 	github.com/titpetric/lessgo v0.2.0
 	github.com/titpetric/phpscript v0.5.0
 	github.com/titpetric/platform v0.7.4
-	github.com/titpetric/vuego v0.10.2
+	github.com/titpetric/vuego v0.11.0
 	gopkg.in/yaml.v3 v3.0.1
-	modernc.org/sqlite v1.59.0
+	modernc.org/sqlite v1.60.0
 )
 
 require (

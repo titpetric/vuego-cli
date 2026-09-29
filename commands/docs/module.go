@@ -83,9 +83,9 @@ func NewModule(contentFS fs.FS) *Module {
 		markdown: markdown.New(ofs),
 		eval:     codeblock.New(DefaultConfig, ofs, vuego.WithLessProcessor()),
 	}
-	m.markdown.Register(markdown.NodeCodeBlock, m.TabsHandler())
-	m.markdown.Register(markdown.NodeCodeBlock, m.eval.CodeBlockHandler())
-	m.markdown.Register(markdown.NodeParagraph, m.DirectivesHandler())
+	m.markdown.Register(m.TabsHandler(), markdown.NodeCodeBlock)
+	m.markdown.Register(m.eval.CodeBlockHandler(), markdown.NodeCodeBlock)
+	m.markdown.Register(m.DirectivesHandler(), markdown.NodeParagraph)
 	return m
 }
 
