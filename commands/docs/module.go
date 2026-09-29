@@ -194,13 +194,6 @@ func (m *Module) serveDoc(w http.ResponseWriter, r *http.Request) error {
 	return notFound(fmt.Errorf("not found: %s", urlPath))
 }
 
-// DocMeta represents frontmatter metadata for a doc.
-type DocMeta struct {
-	Title    string `yaml:"title"`
-	Subtitle string `yaml:"subtitle"`
-	Layout   string `yaml:"layout"`
-}
-
 func (m *Module) renderDoc(ctx context.Context, w http.ResponseWriter, docPath string, content string) error {
 	// Merge front matter from the markdown package
 	doc, err := m.markdown.Load(docPath)
@@ -317,11 +310,6 @@ func (m *Module) renderDirListing(ctx context.Context, w http.ResponseWriter, di
 
 	_, _ = buf.WriteTo(w)
 	return nil
-}
-
-// ServeDocHandler returns an http.HandlerFunc that serves docs (for testing).
-func ServeDocHandler(m *Module) http.HandlerFunc {
-	return handler(m.serveDoc)
 }
 
 // isImagePath returns true if the path has a supported image extension.
