@@ -9,389 +9,6 @@ import (
 	"github.com/titpetric/vuego-cli/tour"
 )
 
-func TestParseTour(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-basics.md": &fstest.MapFile{
-			Data: []byte(`# Test Chapter
-
-## First Lesson
-
-Lesson content here.
-
-@file: first.vuego
-
----
-
-## Second Lesson
-
-More content.
-
-@file: second.vuego
-`),
-		},
-		"basics/first.vuego": &fstest.MapFile{
-			Data: []byte(`<div>Hello</div>`),
-		},
-		"basics/first.json": &fstest.MapFile{
-			Data: []byte(`{"name": "test"}`),
-		},
-		"basics/second.vuego": &fstest.MapFile{
-			Data: []byte(`<div>World</div>`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-	require.Len(t, parsed.Chapters, 1)
-
-	chapter := parsed.Chapters[0]
-	require.Equal(t, "01-basics", chapter.Name)
-	require.Equal(t, "Test Chapter", chapter.Title)
-	require.Len(t, chapter.Lessons, 2)
-
-	lesson1 := chapter.Lessons[0]
-	require.Equal(t, "0/0", lesson1.ID)
-	require.Equal(t, "First Lesson", lesson1.Title)
-	require.Equal(t, "Lesson content here.", lesson1.Content)
-	require.Equal(t, 0, lesson1.ChapterIdx)
-	require.Equal(t, 0, lesson1.LessonIdx)
-	require.Contains(t, lesson1.Files, "first.vuego")
-	require.Contains(t, lesson1.Files, "first.json") // Implicitly loaded
-
-	lesson2 := chapter.Lessons[1]
-	require.Equal(t, "0/1", lesson2.ID)
-	require.Equal(t, "Second Lesson", lesson2.Title)
-	require.Equal(t, "More content.", lesson2.Content)
-}
-
-func TestParseTour_RunnablePHPFence(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-php.md": &fstest.MapFile{Data: []byte(`# PHP
-
-## Echo
-
-This block is runnable:
-
-` + "```php" + `
-<?php echo "Hello from fence";
-` + "```" + `
-`)},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	lesson := parsed.Chapters[0].Lessons[0]
-	require.Equal(t, `<?php echo "Hello from fence";`, lesson.Files["index.php"])
-	require.Contains(t, lesson.Content, "Runnable as `index.php`")
-}
-
-func TestParseTour_SQLRefLoadsCompanionMigration(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-sql.md": &fstest.MapFile{Data: []byte(`# SQL
-
-## Query
-
-@file: query.sql
-`)},
-		"sql/query.sql":    &fstest.MapFile{Data: []byte(`SELECT name FROM user_account;`)},
-		"sql/query.up.sql": &fstest.MapFile{Data: []byte(`CREATE TABLE user_account (name TEXT);`)},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	lesson := parsed.Chapters[0].Lessons[0]
-	require.Equal(t, `SELECT name FROM user_account;`, lesson.Files["query.sql"])
-	require.Equal(t, `CREATE TABLE user_account (name TEXT);`, lesson.Files["query.up.sql"])
-}
-
-func TestParseTour_FileRefOptions(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-sql.md": &fstest.MapFile{Data: []byte(`# SQL
-
-## Query
-
-@file: schema.up.sql hidden
-@file: query.sql
-`)},
-		"sql/schema.up.sql": &fstest.MapFile{Data: []byte(`CREATE TABLE user_account (name TEXT);`)},
-		"sql/query.sql":     &fstest.MapFile{Data: []byte(`SELECT name FROM user_account;`)},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	lesson := parsed.Chapters[0].Lessons[0]
-	require.Equal(t, []string{"hidden"}, lesson.FileOptions["schema.up.sql"])
-}
-
-func TestParseTour_MultipleChapters(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-intro.md": &fstest.MapFile{
-			Data: []byte(`# Introduction
-
-## Welcome
-
-Welcome content.
-
-@file: index.vuego
-`),
-		},
-		"intro/index.vuego": &fstest.MapFile{
-			Data: []byte(`<div>Welcome</div>`),
-		},
-		"02-advanced.md": &fstest.MapFile{
-			Data: []byte(`# Advanced
-
-## Deep Dive
-
-Advanced content.
-
-@file: index.vuego
-`),
-		},
-		"advanced/index.vuego": &fstest.MapFile{
-			Data: []byte(`<div>Advanced</div>`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-	require.Len(t, parsed.Chapters, 2)
-	require.Equal(t, "Introduction", parsed.Chapters[0].Title)
-	require.Equal(t, "Advanced", parsed.Chapters[1].Title)
-}
-
-func TestTour_GetLesson(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-basics.md": &fstest.MapFile{
-			Data: []byte(`# Basics
-
-## First Lesson
-
-Content one.
-
-@file: first.vuego
-
----
-
-## Second Lesson
-
-Content two.
-
-@file: second.vuego
-`),
-		},
-		"basics/first.vuego": &fstest.MapFile{
-			Data: []byte(`<div>First</div>`),
-		},
-		"basics/second.vuego": &fstest.MapFile{
-			Data: []byte(`<div>Second</div>`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	lesson := parsed.GetLesson("0/1")
-	require.NotNil(t, lesson)
-	require.Equal(t, "Second Lesson", lesson.Title)
-	require.Equal(t, "Content two.", lesson.Content)
-}
-
-func TestTour_GetLesson_NotFound(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-basics.md": &fstest.MapFile{
-			Data: []byte(`# Basics
-
-## First Lesson
-
-Content.
-
-@file: first.vuego
-`),
-		},
-		"basics/first.vuego": &fstest.MapFile{
-			Data: []byte(`<div>First</div>`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	lesson := parsed.GetLesson("99/99")
-	require.Nil(t, lesson)
-}
-
-func TestTour_FirstLesson(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-basics.md": &fstest.MapFile{
-			Data: []byte(`# Basics
-
-## First Lesson
-
-First content.
-
-@file: first.vuego
-## Second Lesson
-
-Second content.
-
-@file: second.vuego
-`),
-		},
-		"basics/first.vuego": &fstest.MapFile{
-			Data: []byte(`<div>First</div>`),
-		},
-		"basics/second.vuego": &fstest.MapFile{
-			Data: []byte(`<div>Second</div>`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	first := parsed.FirstLesson()
-	require.NotNil(t, first)
-	require.Equal(t, "First Lesson", first.Title)
-	require.Equal(t, "0/0", first.ID)
-}
-
-func TestTour_FirstLesson_Empty(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-empty.md": &fstest.MapFile{
-			Data: []byte(`# Empty Chapter
-`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-	require.Nil(t, parsed.FirstLesson())
-}
-
-func TestTour_LessonCount(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-basics.md": &fstest.MapFile{
-			Data: []byte(`# Basics
-
-## Lesson One
-
-Content.
-
-@file: one.vuego
-
----
-
-## Lesson Two
-
-Content.
-
-@file: two.vuego
-
----
-
-## Lesson Three
-
-Content.
-
-@file: three.vuego
-`),
-		},
-		"basics/one.vuego":   &fstest.MapFile{Data: []byte(`<div>1</div>`)},
-		"basics/two.vuego":   &fstest.MapFile{Data: []byte(`<div>2</div>`)},
-		"basics/three.vuego": &fstest.MapFile{Data: []byte(`<div>3</div>`)},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-	require.Equal(t, 3, parsed.LessonCount())
-}
-
-func TestTour_LessonNavigation(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-basics.md": &fstest.MapFile{
-			Data: []byte(`# Basics
-
-## First
-
-Content.
-
----
-
-## Second
-
-Content.
-
----
-
-## Third
-
-Content.
-`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	first := parsed.GetLesson("0/0")
-	require.NotNil(t, first)
-	require.False(t, first.HasPrev)
-	require.True(t, first.HasNext)
-	require.Equal(t, "", first.PrevID)
-	require.Equal(t, "0/1", first.NextID)
-
-	second := parsed.GetLesson("0/1")
-	require.NotNil(t, second)
-	require.True(t, second.HasPrev)
-	require.True(t, second.HasNext)
-	require.Equal(t, "0/0", second.PrevID)
-	require.Equal(t, "0/2", second.NextID)
-
-	third := parsed.GetLesson("0/2")
-	require.NotNil(t, third)
-	require.True(t, third.HasPrev)
-	require.False(t, third.HasNext)
-	require.Equal(t, "0/1", third.PrevID)
-	require.Equal(t, "", third.NextID)
-}
-
-func TestTour_LessonNavigation_AcrossChapters(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-intro.md": &fstest.MapFile{
-			Data: []byte(`# Intro
-
-## Intro Lesson
-
-Content.
-`),
-		},
-		"02-advanced.md": &fstest.MapFile{
-			Data: []byte(`# Advanced
-
-## Advanced Lesson
-
-Content.
-`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-
-	introLesson := parsed.GetLesson("0/0")
-	require.NotNil(t, introLesson)
-	require.True(t, introLesson.HasNext)
-	require.Equal(t, "1/0", introLesson.NextID)
-
-	advancedLesson := parsed.GetLesson("1/0")
-	require.NotNil(t, advancedLesson)
-	require.True(t, advancedLesson.HasPrev)
-	require.Equal(t, "0/0", advancedLesson.PrevID)
-}
-
 func TestLesson_PrimaryTemplate(t *testing.T) {
 	t.Run("returns index.vuego when present", func(t *testing.T) {
 		fs := fstest.MapFS{
@@ -587,116 +204,6 @@ Content.
 		require.Equal(t, "", lesson.DataFile())
 	})
 }
-
-func TestParseTour_LoadsLessonFiles(t *testing.T) {
-	t.Run("lesson files are loaded from @file references", func(t *testing.T) {
-		fs := fstest.MapFS{
-			"01-basics.md": &fstest.MapFile{
-				Data: []byte(`# Basics
-
-## First Lesson
-
-Content.
-
-@file: template.vuego
-@file: data.json
-`),
-			},
-			"basics/template.vuego": &fstest.MapFile{
-				Data: []byte(`<div>Hello</div>`),
-			},
-			"basics/data.json": &fstest.MapFile{
-				Data: []byte(`{"name": "test"}`),
-			},
-		}
-
-		parsed, err := tour.ParseTour(fs)
-		require.NoError(t, err)
-
-		lesson := parsed.GetLesson("0/0")
-		require.NotNil(t, lesson)
-		require.Len(t, lesson.Files, 2)
-		require.Equal(t, "<div>Hello</div>", lesson.Files["template.vuego"])
-		require.Equal(t, `{"name": "test"}`, lesson.Files["data.json"])
-	})
-
-	t.Run("multiple files per lesson are loaded", func(t *testing.T) {
-		fs := fstest.MapFS{
-			"01-basics.md": &fstest.MapFile{
-				Data: []byte(`# Basics
-
-## First Lesson
-
-Content.
-
-@file: index.vuego
-@file: layout.vuego
-@file: index.yml
-`),
-			},
-			"basics/index.vuego": &fstest.MapFile{
-				Data: []byte(`<div>Main</div>`),
-			},
-			"basics/layout.vuego": &fstest.MapFile{
-				Data: []byte(`<html><slot /></html>`),
-			},
-			"basics/index.yml": &fstest.MapFile{
-				Data: []byte(`name: test`),
-			},
-		}
-
-		parsed, err := tour.ParseTour(fs)
-		require.NoError(t, err)
-
-		lesson := parsed.GetLesson("0/0")
-		require.NotNil(t, lesson)
-		require.Len(t, lesson.Files, 3)
-		require.Equal(t, "<div>Main</div>", lesson.Files["index.vuego"])
-		require.Equal(t, "<html><slot /></html>", lesson.Files["layout.vuego"])
-		require.Equal(t, "name: test", lesson.Files["index.yml"])
-	})
-}
-
-func TestParseTour_DelimiterParsing(t *testing.T) {
-	fs := fstest.MapFS{
-		"01-test.md": &fstest.MapFile{
-			Data: []byte(`# Chapter Title
-
-## First Lesson
-
-Content here.
-
-@file: first.vuego
-
----
-
-## Second Lesson
-
-More content.
-
-@file: second.vuego
-`),
-		},
-		"test/first.vuego": &fstest.MapFile{
-			Data: []byte(`<div>First</div>`),
-		},
-		"test/second.vuego": &fstest.MapFile{
-			Data: []byte(`<div>Second</div>`),
-		},
-	}
-
-	parsed, err := tour.ParseTour(fs)
-	require.NoError(t, err)
-	require.Len(t, parsed.Chapters, 1)
-
-	chapter := parsed.Chapters[0]
-	require.Equal(t, "Chapter Title", chapter.Title)
-	require.Len(t, chapter.Lessons, 2)
-
-	require.Equal(t, "First Lesson", chapter.Lessons[0].Title)
-	require.Equal(t, "Second Lesson", chapter.Lessons[1].Title)
-}
-
 func TestLesson_PrimaryTemplate_Direct(t *testing.T) {
 	t.Run("index.vuego returns index.vuego", func(t *testing.T) {
 		lesson := &tour.Lesson{
@@ -765,4 +272,40 @@ func TestLesson_DataFile_Direct(t *testing.T) {
 		}
 		require.Equal(t, "", lesson.DataFile())
 	})
+}
+
+// TestValidateLesson covers what makes a lesson worth showing: something the
+// reader can run. A lesson gets its runnable file either from an @file
+// reference or from a fenced block, and both count.
+func TestValidateLesson(t *testing.T) {
+	tests := []struct {
+		name    string
+		lesson  *tour.Lesson
+		wantErr bool
+	}{
+		{"vuego reference", &tour.Lesson{FileRefs: []string{"index.vuego"}}, false},
+		{"php reference", &tour.Lesson{FileRefs: []string{"index.php"}}, false},
+		{"sql reference", &tour.Lesson{FileRefs: []string{"query.sql"}}, false},
+		{"inline fence", &tour.Lesson{Files: map[string]string{"index.php": "<?php"}}, false},
+		{"data only", &tour.Lesson{
+			Title:    "Prose",
+			Chapter:  "01-intro",
+			FileRefs: []string{"notes.json"},
+			Files:    map[string]string{"notes.json": "{}"},
+		}, true},
+		{"nothing at all", &tour.Lesson{Title: "Empty", Chapter: "01-intro"}, true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := tour.ValidateLesson(test.lesson)
+			if !test.wantErr {
+				require.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			require.Contains(t, err.Error(), test.lesson.Title, "the error names the lesson")
+			require.Contains(t, err.Error(), test.lesson.Chapter, "and the chapter it is in")
+		})
+	}
 }

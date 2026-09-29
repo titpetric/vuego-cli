@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"testing/fstest"
 
 	chi "github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
@@ -249,4 +250,10 @@ func TestModule_RenderEndpoint_InjectsStyleTags(t *testing.T) {
 	require.Empty(t, resp["error"])
 	require.Contains(t, resp["html"], "<style")
 	require.Contains(t, resp["html"], ".form-group a {")
+}
+
+// TestModule_Name covers the name the platform registers the tour under, which
+// is also what the telemetry dashboard labels it with.
+func TestModule_Name(t *testing.T) {
+	require.Equal(t, "vuego-tour", tour.NewModule(fstest.MapFS{}).Name())
 }
