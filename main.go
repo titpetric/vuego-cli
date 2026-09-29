@@ -25,8 +25,16 @@ func main() {
 
 func run() error {
 	app := cli.NewApp("vuego-cli")
+	registerCommands(app)
+	return app.Run()
+}
 
-	// Register commands
+// registerCommands adds every command the binary exposes to app.
+//
+// It is separate from run() so a test can register against an app whose output
+// streams it owns, without the app reading os.Args or writing to the process
+// streams.
+func registerCommands(app *cli.App) {
 	app.AddCommand("fmt", format.Name, format.New)
 	app.AddCommand("render", render.Name, render.New)
 	app.AddCommand("diff", diff.Name, diff.New)
@@ -45,6 +53,4 @@ func run() error {
 			Modified:   Modified,
 		})
 	})
-
-	return app.Run()
 }
