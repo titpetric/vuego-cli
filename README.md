@@ -2,6 +2,10 @@
 
 Command-line interface for the vuego template engine. Vuego is a lightweight, expression-based templating system for generating content from templates and data files.
 
+> Note: Vuego out of maintenance, 2026-11-11
+>
+> The Vuego template engine has become disused. I currently use [phpscript](https://github.com/titpetric/phpscript) and [minitpl](https://github.com/titpetric/minitpl) for a complete web application runtime and not just templating. For a go-native solution that has better allocation and performance characteristics, see [github.com/a-h/templ](https://github.com/a-h/templ).
+
 ## Installation
 
 ```bash
